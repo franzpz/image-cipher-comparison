@@ -1,10 +1,18 @@
 package at.fhjoanneum.platzerf.imageciphercomparison;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,12 +24,11 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
-    private int[] originalImageBytes = new int[]{
-            201, 40, 208, 200, 39, 207, 214, 53, 221,
-            213, 52, 220, 216, 50, 220, 216, 50, 220
-    };
+    private int[] originalImageBytes;
 
-    private int[] encryptedImageBytes = new int[originalImageBytes.length];
+    private long sumOfImageBytes = 0;
+
+    private int[] encryptedImageBytes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,17 +37,41 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         upperText = (TextView) findViewById(R.id.sample_text);
-        upperText.setText("Original Image Bytes: " + arrayToStringList(originalImageBytes));
 
+        Bitmap image = BitmapFactory.decodeFile("/sdcard/Download/2x3image.jpg");
+
+        int[] pixels = new int[image.getHeight()*image.getWidth()*3];
+
+        int pos = 0;
+        for(int y = 0; y < image.getHeight(); y++) {
+            for(int x = 0; x < image.getWidth(); x++) {
+                int pixel = image.getPixel(x, y);
+                pixels[pos*3] = Color.red(pixel);
+                pixels[pos*3+1] = Color.green(pixel);
+                pixels[pos*3+2] = Color.blue(pixel);
+                pos++;
+            }
+        }
+
+        originalImageBytes = pixels;
+        encryptedImageBytes = new int[originalImageBytes.length];
+
+        for(int i = 0; i < originalImageBytes.length; i++){
+            sumOfImageBytes += originalImageBytes[i];
+        }
+
+        upperText.setText("Original Image Bytes: " + arrayToStringList(originalImageBytes));
 
         lowerText = (TextView) findViewById(R.id.textView);
         lowerText.setText("do something...");
     }
 
-    public void onDecrypt() {
-        encryptedImageBytes = decryptImageBytes(originalImageBytes);
+    void
 
-        lowerText.setText("Decrypted successfully: " + arrayToStringList(encryptedImageBytes));
+    public void onDecrypt(View v) {
+        int[] decryptImageBytes = decryptImageBytes(encryptedImageBytes, sumOfImageBytes);
+
+        lowerText.setText("Decrypted successfully: " + arrayToStringList(decryptImageBytes));
     }
 
     private String arrayToStringList(int[] array) {
@@ -52,10 +83,8 @@ public class MainActivity extends AppCompatActivity {
         return s.toString();
     }
 
-    public void onEncrypt() {
-
-
-        encryptedImageBytes = encryptImageBytes(originalImageBytes);
+    public void onEncrypt(View v) {
+        encryptedImageBytes = encryptImageBytes(originalImageBytes, sumOfImageBytes);
 
         lowerText.setText("Encrypted successfully: " + arrayToStringList(encryptedImageBytes));
     }
@@ -64,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
-
-    public native int[] encryptImageBytes(int[] originalImageBytes);
-    public native int[] decryptImageBytes(int[] originalImageBytes);
+    public native int[] encryptImageBytes(int[] originalImageBytes, long sumOfImageBytes);
+    public native int[] decryptImageBytes(int[] originalImageBytes, long sumOfImageBytes);
 }

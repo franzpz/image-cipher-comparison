@@ -4,8 +4,8 @@
 #include <math.h>
 #include <android/log.h>
 
-#define DEV 1
-#define TEST 1
+//#define DEV 1
+//#define TEST 1
 
 #define log_error_f(tag,fmt,...) __android_log_print(ANDROID_LOG_ERROR,tag,fmt,__VA_ARGS__)
 #define log_error(tag,msg) __android_log_print(ANDROID_LOG_ERROR,tag,msg)

@@ -16,8 +16,6 @@ extern "C" {
 
 #define TAG "Ciphers C"
 
-
-
 extern "C"
 void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sumOfBytes){
     PermutationSetup permSetups[4];
@@ -49,82 +47,64 @@ void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sum
     runAlgorithm(mode, imageBytes, length, sumOfBytes, permSetups, diffuSetups,  encryptionRounds);
 }
 
+void convertToUnsignedCharArray(unsigned char *convImageBytes, jint *imageBytes, long length) {
+//    log_info(TAG, "------- Provided Image -------");
+    for(int i = 0; i < length; i++) {
+        convImageBytes[i] = (unsigned char)imageBytes[i];
+        //log_info_f(TAG, "%d - %u", i, convImageBytes[i]);
+    }
+}
+
+void convertToJintArray(unsigned char *convImageBytes, jint *imageBytes, long length) {
+    //log_info(TAG, "------- Converted Image -------");
+    for(int i = 0; i < length; i++) {
+        imageBytes[i] = convImageBytes[i];
+        //log_info_f(TAG, "%d - %u", i, imageBytes[i]);
+    }
+}
+
+extern "C"
 JNIEXPORT jintArray JNICALL
 Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_decryptImageBytes(JNIEnv *env,
                                                                                  jobject instance,
-                                                                                 jintArray originalImageBytes_) {
+                                                                                 jintArray originalImageBytes_,
+                                                                                 jlong sumOfImageBytes) {
     jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
-    int len = env->GetArrayLength(originalImageBytes_);
+    long len = env->GetArrayLength(originalImageBytes_);
 
     unsigned char imageBytes[len];
-    long sumOfBytes = 0;
+    long sumOfBytes = (long)sumOfImageBytes;
 
-    log_info(TAG, "------- Original Image -------");
-    for(int i = 0; i < len; i++) {
-        imageBytes[i] = (unsigned char)originalImageBytes[i];
-        //sumOfBytes += imageBytes[i];
-        log_info_f(TAG, "%d - %u", i, imageBytes[i]);
-        sumOfBytes += imageBytes[i];
-    }
-    log_info_f(TAG, "imagecipher call %d", 123);
-
+    convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
 
     useImageCipher1(DEC_MODE, imageBytes, len, sumOfBytes);
 
-
-    log_info(TAG, "------- Encrypted Image -------");
-    for(int i = 0; i < len; i++) {
-        originalImageBytes[i] = imageBytes[i];
-        log_info_f(TAG, "%d - %u", i, imageBytes[i]);
-    }
+    convertToJintArray(imageBytes, originalImageBytes, len);
 
     env->SetIntArrayRegion(originalImageBytes_, 0, len, originalImageBytes);
     env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
-    return originalImageBytes_;
+    return  originalImageBytes_;
 }
 
 extern "C"
 JNIEXPORT jintArray JNICALL
 Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_encryptImageBytes(JNIEnv *env,
                                                                                  jobject instance,
-                                                                                 jintArray originalImageBytes_) {
+                                                                                 jintArray originalImageBytes_,
+                                                                                 jlong sumOfImageBytes) {
     jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
     int len = env->GetArrayLength(originalImageBytes_);
 
     unsigned char imageBytes[len];
-    long sumOfBytes = 0;
+    long sumOfBytes = (long)sumOfImageBytes;
 
-    log_info(TAG, "------- Original Image -------");
-    for(int i = 0; i < len; i++) {
-        imageBytes[i] = (unsigned char)originalImageBytes[i];
-        //sumOfBytes += imageBytes[i];
-        log_info_f(TAG, "%d - %u", i, imageBytes[i]);
-        sumOfBytes += imageBytes[i];
-    }
-    log_info_f(TAG, "imagecipher call %d", 123);
-
+    convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
 
     useImageCipher1(ENC_MODE, imageBytes, len, sumOfBytes);
 
-
-    log_info(TAG, "------- Encrypted Image -------");
-    for(int i = 0; i < len; i++) {
-        originalImageBytes[i] = imageBytes[i];
-        log_info_f(TAG, "%d - %u", i, imageBytes[i]);
-    }
+    convertToJintArray(imageBytes, originalImageBytes, len);
 
     env->SetIntArrayRegion(originalImageBytes_, 0, len, originalImageBytes);
     env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
     return originalImageBytes_;
-}
-
-
-
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
 }
