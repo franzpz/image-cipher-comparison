@@ -7,22 +7,34 @@
     android:orientation="vertical"
     tools:context="at.fhjoanneum.platzerf.imageciphercomparison.MainActivity">
 
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <TextView
         android:id="@+id/sample_text"
         android:layout_width="match_parent"
-        android:layout_height="209dp"
+        android:layout_height="150dp"
         android:text="Hello World!" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="186dp"
+        android:layout_height="114dp"
         android:text="Hello World!" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onLoadImage"
+            android:text="load image" />
 
         <Button
             android:id="@+id/button3"

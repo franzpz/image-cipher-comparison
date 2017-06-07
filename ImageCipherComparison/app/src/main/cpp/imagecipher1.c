@@ -17,8 +17,8 @@ double generateControlParametersIkedaMap(double miu, double avgOfImageByteSum, l
 void runAlgorithm(int mode, unsigned char *imageBytes, long numberOfImageBytes, long sumOfAllImageBytes, PermutationSetup permutationSetups[4], DiffusionSetup diffusionSetups[2], int encryptionRounds) {
 
     // copy setups so they are not changed
-    PermutationSetup permSetups[4];
-    DiffusionSetup diffuSetups[2];
+    PermutationSetup *permSetups = (PermutationSetup*)malloc(sizeof(PermutationSetup)*4);
+    DiffusionSetup *diffuSetups = (DiffusionSetup*)malloc(sizeof(DiffusionSetup)*2);
 
     for(int i = 0; i < 4; i ++) {
         permSetups[i].r = permutationSetups[i].r;
@@ -93,7 +93,7 @@ void runAlgorithm(int mode, unsigned char *imageBytes, long numberOfImageBytes, 
     // 3. generate control parameters for ikeda map based on image
     PTF("\n-------------Diffustion Parameters\n");
     for(int i = 0; i < 2; i++) {
-        diffuSetups[i].miu = generateControlParametersLogisticMap(diffuSetups[i].miu, avg, numberOfImageBytes);
+        diffuSetups[i].miu = generateControlParametersIkedaMap(diffuSetups[i].miu, avg, numberOfImageBytes);
         PTF("miu%d = %.15f\n", i, diffuSetups[i].miu);
     }
     PTF("-------------\n");
@@ -118,6 +118,9 @@ void runAlgorithm(int mode, unsigned char *imageBytes, long numberOfImageBytes, 
         PTF(" ]-------------------\n");
         #endif
     }
+
+    free(permSetups);
+    free(diffuSetups);
 
     if(mode == ENC_MODE) {
         // 5. Encryption rounds
@@ -196,8 +199,8 @@ void createDiffusionSequenceIkedaMap(double miu, double x, double y, unsigned ch
         if(i >= entriesToSkip) {
             absX = fabs(xn);
             absY = fabs(yn);
-            mOneSequence[i-entriesToSkip] = ((long long)((absX - ((double)floor(absX))) * multiply)) % 255;
-            mTwoSequence[i-entriesToSkip] = ((long long)((absY - ((double)floor(absY))) * multiply)) % 255;
+            mOneSequence[i-entriesToSkip] = (unsigned char)(((long long)((absX - ((double)floor(absX))) * multiply)) % 255);
+            mTwoSequence[i-entriesToSkip] = (unsigned char)(((long long)((absY - ((double)floor(absY))) * multiply)) % 255);
 
             //PTF("%d - xn: %.20f yn: %.20f m1: %d\n", i, xn, yn, mOneSequence[i-entriesToSkip]);
             //PTF("%d - xn: %.20f yn: %.20f m1: %d\n", i, xn, yn, mTwoSequence[i-entriesToSkip]);

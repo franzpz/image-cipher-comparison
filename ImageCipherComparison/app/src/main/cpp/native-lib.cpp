@@ -18,7 +18,7 @@ extern "C" {
 
 extern "C"
 void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sumOfBytes){
-    PermutationSetup permSetups[4];
+    PermutationSetup *permSetups = (PermutationSetup*)malloc(sizeof(PermutationSetup)*4);
 
     permSetups[0].r = 3.6000000001;
     permSetups[0].x = 0.8000000001;
@@ -32,7 +32,7 @@ void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sum
     permSetups[3].r = 3.6000000004;
     permSetups[3].x = 0.8000000004;
 
-    DiffusionSetup diffuSetups[2];
+    DiffusionSetup *diffuSetups = (DiffusionSetup*)malloc(sizeof(DiffusionSetup)*2);
 
     diffuSetups[0].miu = 0.8597000122;
     diffuSetups[0].x = 0.7733460001;
@@ -45,6 +45,9 @@ void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sum
     int encryptionRounds = 2;
 
     runAlgorithm(mode, imageBytes, length, sumOfBytes, permSetups, diffuSetups,  encryptionRounds);
+
+    free(permSetups);
+    free(diffuSetups);
 }
 
 void convertToUnsignedCharArray(unsigned char *convImageBytes, jint *imageBytes, long length) {
@@ -95,7 +98,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_encryptImageBytes
     jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
     int len = env->GetArrayLength(originalImageBytes_);
 
-    unsigned char imageBytes[len];
+    unsigned char *imageBytes = (unsigned char*)malloc(sizeof(unsigned char)*len);
     long sumOfBytes = (long)sumOfImageBytes;
 
     convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
@@ -105,6 +108,8 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_encryptImageBytes
     convertToJintArray(imageBytes, originalImageBytes, len);
 
     env->SetIntArrayRegion(originalImageBytes_, 0, len, originalImageBytes);
+
+    free(imageBytes);
     env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
     return originalImageBytes_;
 }
