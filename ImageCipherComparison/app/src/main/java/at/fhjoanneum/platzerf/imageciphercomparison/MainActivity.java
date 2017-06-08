@@ -142,7 +142,12 @@ public class MainActivity extends AppCompatActivity {
             ConvertedImage encryptedImage = conv.ConvertFromArgbImage(filename);
 
             long startTime = System.nanoTime();
-            encryptedImage.ImageBytes = decryptImageBytes(encryptedImage.ImageBytes, originalImage.SumOfBytes);
+            try {
+                encryptedImage.ImageBytes = decryptImageBytes(encryptedImage.ImageBytes, originalImage.SumOfBytes);
+            }
+            catch (Exception e){
+                return e.toString();
+            }
             long endTime = System.nanoTime();
 
             encryptedImage.Config = originalImage.Config;
@@ -182,7 +187,12 @@ public class MainActivity extends AppCompatActivity {
             //image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
 
             long startTime = System.nanoTime();
-            image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
+            try {
+                image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
+            }
+            catch (Exception e){
+                return e.toString();
+            }
             long endTime = System.nanoTime();
 
             conv.saveArgbImage(image, newFilename);

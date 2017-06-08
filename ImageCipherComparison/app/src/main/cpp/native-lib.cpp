@@ -72,17 +72,20 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_decryptImageBytes
     jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
     long len = env->GetArrayLength(originalImageBytes_);
 
-    unsigned char imageBytes[len];
+    unsigned char *imageBytes = (unsigned char*)malloc(sizeof(unsigned char)*len);
     long sumOfBytes = (long)sumOfImageBytes;
 
     convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
+    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
 
     useImageCipher1(DEC_MODE, imageBytes, len, sumOfBytes);
 
-    convertToJintArray(imageBytes, originalImageBytes, len);
+    jint* convertedImageBytes = (jint*)malloc(sizeof(jint*)*len);
+    convertToJintArray(imageBytes, convertedImageBytes, len);
+    free(imageBytes);
 
-    env->SetIntArrayRegion(originalImageBytes_, 0, len, originalImageBytes);
-    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
+    env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
+    env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
     return  originalImageBytes_;
 }
 
@@ -99,14 +102,15 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_encryptImageBytes
     long sumOfBytes = (long)sumOfImageBytes;
 
     convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
+    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
 
     useImageCipher1(ENC_MODE, imageBytes, len, sumOfBytes);
 
-    convertToJintArray(imageBytes, originalImageBytes, len);
-
-    env->SetIntArrayRegion(originalImageBytes_, 0, len, originalImageBytes);
-
+    jint* convertedImageBytes = (jint*)malloc(sizeof(jint*)*len);
+    convertToJintArray(imageBytes, convertedImageBytes, len);
     free(imageBytes);
-    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
+
+    env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
+    env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
     return originalImageBytes_;
 }
