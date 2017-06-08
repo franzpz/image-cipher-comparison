@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <android/log.h>
 #include "imagecipher1.h"
 
 void printSequence(double a[], long n);
@@ -16,8 +17,8 @@ double generateControlParametersIkedaMap(double miu, double avgOfImageByteSum, l
 void runAlgorithm(int mode, unsigned char *imageBytes, long numberOfImageBytes, long sumOfAllImageBytes, PermutationSetup permutationSetups[4], DiffusionSetup diffusionSetups[2], int encryptionRounds) {
 
     // copy setups so they are not changed
-    PermutationSetup permSetups[4];
-    DiffusionSetup diffuSetups[2];
+    PermutationSetup *permSetups = (PermutationSetup*)malloc(sizeof(PermutationSetup)*4);
+    DiffusionSetup *diffuSetups = (DiffusionSetup*)malloc(sizeof(DiffusionSetup)*2);
 
     for(int i = 0; i < 4; i ++) {
         permSetups[i].r = permutationSetups[i].r;
@@ -54,19 +55,11 @@ void runAlgorithm(int mode, unsigned char *imageBytes, long numberOfImageBytes, 
     }
     PTF_IMPT("-------------------\n");
 
-    PTF_IMPT("Image size (number of bytes) = %ld\n", numberOfImageBytes);
+    PTF_IMPT("Image size (number of bytes) = %d\n", numberOfImageBytes);
     #endif
 
-    /*int permutationSequenceLogisticMap[4][numberOfImageBytes];
-    unsigned char diffustionSequenceIkedaMap[4][numberOfImageBytes];*/
-
-    int **permutationSequenceLogisticMap = (int**)malloc(sizeof(int*)*4);
-    unsigned char **diffustionSequenceIkedaMap = (unsigned char**)malloc(sizeof(unsigned char*)*4);
-
-    for(int i = 0; i < 4; i++){
-        permutationSequenceLogisticMap[i] = (int*)malloc(sizeof(int)*numberOfImageBytes);
-        diffustionSequenceIkedaMap[i] = (unsigned char *)malloc(sizeof(unsigned char)*numberOfImageBytes);
-    }
+    int permutationSequenceLogisticMap[4][numberOfImageBytes];
+    unsigned char diffustionSequenceIkedaMap[4][numberOfImageBytes];
 
     double avg = 0;
     PTF_IMPT("Sum of bytes = %ld\n", sumOfAllImageBytes);
@@ -126,75 +119,50 @@ void runAlgorithm(int mode, unsigned char *imageBytes, long numberOfImageBytes, 
         #endif
     }
 
+    free(permSetups);
+    free(diffuSetups);
+
     if(mode == ENC_MODE) {
         // 5. Encryption rounds
-        unsigned char *tmpImageBytes = (unsigned char*)malloc(sizeof(unsigned char)*numberOfImageBytes);
-        //memcpy(tmpImageBytes, imageBytes, numberOfImageBytes * sizeof(unsigned char));
+        unsigned char tmpImageBytes[numberOfImageBytes];
+        memcpy(tmpImageBytes, imageBytes, numberOfImageBytes * sizeof(unsigned char));
 
         long k, j;
         for(int i = 0; i < encryptionRounds; i++) {
 
             for(k = 0; k < 4; k++) {
-                PTF("\n----------- round %d after permutation %d [", i, k);
+                PTF("\n----------- round %d after permutation %d and diffustion %d [", i, k, k);
                 for(j = 0; j < numberOfImageBytes; j++) {
-                    tmpImageBytes[j] = imageBytes[permutationSequenceLogisticMap[k][j]]^diffustionSequenceIkedaMap[k][j];
-                    PTF("%u, ", tmpImageBytes[j]);
+                    imageBytes[j] = tmpImageBytes[permutationSequenceLogisticMap[k][j]]^diffustionSequenceIkedaMap[k][j];
+                    PTF("%u, ", imageBytes[j]);
                 }
                 PTF("] \n");
 
-/*
-                PTF("\n----------- round %d after diffustion %d [", i, k);
-                for(j = 0; j < numberOfImageBytes; j++) {
-                    imageBytes[j] = tmpImageBytes[j]^diffustionSequenceIkedaMap[k][j];
-                    PTF("%u, ", imageBytes[j]);
-                }
-                PTF("] \n");*/
-
-                memcpy(imageBytes, tmpImageBytes, numberOfImageBytes * sizeof(unsigned char));
+                memcpy(tmpImageBytes, imageBytes, numberOfImageBytes * sizeof(unsigned char));
             }
         }
-
-        free(tmpImageBytes);
     }
     else if(mode == DEC_MODE) {
         // 5. decryption rounds
-        unsigned char *tmpImageBytes = (unsigned char*)malloc(sizeof(unsigned char)*numberOfImageBytes);
-        //memcpy(tmpImageBytes, imageBytes, numberOfImageBytes * sizeof(unsigned char));
+        unsigned char tmpImageBytes[numberOfImageBytes];
+        memcpy(tmpImageBytes, imageBytes, numberOfImageBytes * sizeof(unsigned char));
 
         long k, j;
         for(int i = 0; i < encryptionRounds; i++) {
 
             for(k = 3; k >= 0; k--) {
 
-                PTF("\n----------- round %d after permutation %d [", i, k);
+                PTF("\n----------- [ORDER NOT RIGHT - optimized] round %d after permutation %d and diffustion %d [", i, k, k);
                 for(j = 0; j < numberOfImageBytes; j++) {
-                    tmpImageBytes[permutationSequenceLogisticMap[k][j]] = imageBytes[j]^diffustionSequenceIkedaMap[k][j];
-                    PTF("%u, ", tmpImageBytes[j]);
-                }
-                PTF("] \n");
-/*
-                PTF("\n----------- round %d after diffustion %d [", i, k);
-                for(j = 0; j < numberOfImageBytes; j++) {
-                    imageBytes[permutationSequenceLogisticMap[k][j]] = tmpImageBytes[j];
+                    imageBytes[permutationSequenceLogisticMap[k][j]] = tmpImageBytes[j]^diffustionSequenceIkedaMap[k][j];
                     PTF("%u, ", imageBytes[j]);
                 }
                 PTF("] \n");
-                */
 
-                memcpy(imageBytes, tmpImageBytes, numberOfImageBytes * sizeof(unsigned char));
+                memcpy(tmpImageBytes, imageBytes, numberOfImageBytes * sizeof(unsigned char));
             }
         }
-
-        free(tmpImageBytes);
     }
-
-    for(int i = 0; i < 4; i++){
-        free(permutationSequenceLogisticMap[i]);
-        free(diffustionSequenceIkedaMap[i]);
-    }
-
-    free(permutationSequenceLogisticMap);
-    free(diffustionSequenceIkedaMap);
 
     #ifdef TEST
     PTF_IMPT("\n----------- output Image [");
@@ -231,8 +199,8 @@ void createDiffusionSequenceIkedaMap(double miu, double x, double y, unsigned ch
         if(i >= entriesToSkip) {
             absX = fabs(xn);
             absY = fabs(yn);
-            mOneSequence[i-entriesToSkip] = ((long long)((absX - ((double)floor(absX))) * multiply)) % 255;
-            mTwoSequence[i-entriesToSkip] = ((long long)((absY - ((double)floor(absY))) * multiply)) % 255;
+            mOneSequence[i-entriesToSkip] = (unsigned char)(((long long)((absX - ((double)floor(absX))) * multiply)) % 255);
+            mTwoSequence[i-entriesToSkip] = (unsigned char)(((long long)((absY - ((double)floor(absY))) * multiply)) % 255);
 
             //PTF("%d - xn: %.20f yn: %.20f m1: %d\n", i, xn, yn, mOneSequence[i-entriesToSkip]);
             //PTF("%d - xn: %.20f yn: %.20f m1: %d\n", i, xn, yn, mTwoSequence[i-entriesToSkip]);
@@ -267,7 +235,7 @@ double generateControlParametersLogisticMap(double basicR, double avgOfImageByte
 }
 
 void createPermutationSequence(int permutationSequence[], double r, double x, long sequenceLength) {
-    double *sequenceS = (double*)malloc(sizeof(double)*sequenceLength);
+    double sequenceC[sequenceLength];
     double xn = x;
 
     // create original chaotic sequence (skip 1st 1000 entries)
@@ -275,7 +243,7 @@ void createPermutationSequence(int permutationSequence[], double r, double x, lo
     for(long i = 0; i < transientResultsToSkip + sequenceLength; i++) {
         xn = r * xn * (1 - xn);
         if(i >= transientResultsToSkip)
-            sequenceS[i-transientResultsToSkip] = xn;
+            sequenceC[i-transientResultsToSkip] = xn;
     }
     /*
     PTF("original sequence C\n");
@@ -283,9 +251,7 @@ void createPermutationSequence(int permutationSequence[], double r, double x, lo
     */
 
     // create sorted sequence S based on sequence C
-    //memcpy(sequenceS, sequenceC, sequenceLength * sizeof(double));
-
-    sort(sequenceS, sequenceLength);
+    sort(sequenceC, sequenceLength);
 
     /*
     PTF("sorted sequence S\n");
@@ -293,16 +259,13 @@ void createPermutationSequence(int permutationSequence[], double r, double x, lo
     */
 
     // better allocation (use malloc)
-    int numberOfGroups = 10;
-    double **groupedArrays = (double**)malloc(sizeof(double*)*numberOfGroups);
-    int groupArrayLengths = (int)sequenceLength;
-    int *lastGroupedArrayPosition = (int*)malloc(sizeof(int)*numberOfGroups);
+    double groupedArrays[10][sequenceLength];
+    int lastGroupedArrayPosition[10];
 
     // initialize arrays
     int j;
-    for(int i = 0; i < numberOfGroups; i++) {
+    for(int i = 0; i < 10; i++) {
         lastGroupedArrayPosition[i] = 0;
-        groupedArrays[i] = (double*)malloc(sizeof(double)*groupArrayLengths);
 
         for(j = 0; j < sequenceLength; j++) {
             groupedArrays[i][j] = -1;
@@ -315,7 +278,7 @@ void createPermutationSequence(int permutationSequence[], double r, double x, lo
 
     for(long i = 0; i < sequenceLength; i++) {
 
-        tmpTimes = sequenceS[i]*1000000;
+        tmpTimes = sequenceC[i]*1000000;
         // get group number
         tmpResult1 = (((int)floor(tmpTimes)) % 10);
         tmpResult2 = (((int)floor(tmpTimes * 1000)) % 10);
@@ -329,28 +292,21 @@ void createPermutationSequence(int permutationSequence[], double r, double x, lo
             return;
 
         // set value into appropriate group array
-        groupedArrays[groupNumber][lastGroupedArrayPosition[groupNumber]++] = sequenceS[i];
+        groupedArrays[groupNumber][lastGroupedArrayPosition[groupNumber]++] = sequenceC[i];
     }
 
-    long permutationIndex = 0;
+    int permutationIndex = 0;
 
-    for(int i = 0; i < numberOfGroups; i++) {
+    for(int i = 0; i < 10; i++) {
         if(permutationIndex >= sequenceLength)
             break;
 
         j = 0;
         while(groupedArrays[i][j] > 0) {
-            permutationSequence[permutationIndex++] = find(sequenceS, groupedArrays[i][j], sequenceLength);
+            permutationSequence[permutationIndex++] = find(sequenceC, groupedArrays[i][j], sequenceLength);
             j++;
         }
     }
-
-    for(int i = 0; i < numberOfGroups; i++){
-        free(groupedArrays[i]);
-    }
-    free(groupedArrays);
-    free(lastGroupedArrayPosition);
-    free(sequenceS);
 }
 
 void printSequence(double a[], long n) {
