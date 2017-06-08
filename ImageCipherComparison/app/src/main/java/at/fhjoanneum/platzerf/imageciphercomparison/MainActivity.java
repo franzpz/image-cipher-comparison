@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,8 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView upperText;
     private TextView lowerText;
     private EditText editText;
-
-
+    private NumberPicker numberPicker;
 
     private Dictionary<String, String> filenamesToFullPath = new Hashtable<>();
     private Dictionary<String, ImageCipher> ciphers = new Hashtable<>();
@@ -77,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
         upperText = (TextView) findViewById(R.id.sample_text);
         lowerText = (TextView) findViewById(R.id.textView);
         editText = (EditText) findViewById(R.id.editText);
+        numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
+        numberPicker.setMinValue(0);
+        numberPicker.setMaxValue(100);
 
         verifyStoragePermissions(this);
 
@@ -85,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         selectedCipher = one;
 
         editText.setText(basePath);
+        numberPicker.setValue(1);
 
         loadFileList();
         spinner.requestFocus();
@@ -123,6 +127,12 @@ public class MainActivity extends AppCompatActivity {
 
     private class DecryptTask extends AsyncTask<String, Integer, String> {
 
+        private int rounds;
+
+        public DecryptTask(int rounds){
+            this.rounds = rounds;
+        }
+
         @Override
         protected String doInBackground(String... params) {
             String filename = params[0];
@@ -136,7 +146,8 @@ public class MainActivity extends AppCompatActivity {
 
             long startTime = System.nanoTime();
             try {
-                encryptedImage.ImageBytes = selectedCipher.decrypt(encryptedImage.ImageBytes, originalImage.SumOfBytes);
+                for(int i = 0; i < rounds; i++)
+                    encryptedImage.ImageBytes = selectedCipher.decrypt(encryptedImage.ImageBytes, originalImage.SumOfBytes);
             }
             catch (Exception e){
                 return e.toString();
@@ -157,6 +168,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class EncryptTask extends AsyncTask<String, Integer, String> {
+
+        private int rounds;
+
+        public EncryptTask(int rounds){
+            this.rounds = rounds;
+        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -181,7 +198,8 @@ public class MainActivity extends AppCompatActivity {
 
             long startTime = System.nanoTime();
             try {
-                image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes);
+                for(int i = 0; i < rounds; i++)
+                    image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes);
             }
             catch (Exception e){
                 return e.toString();
@@ -200,13 +218,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDecrypt(View v) {
-        DecryptTask t = new DecryptTask();
+        DecryptTask t = new DecryptTask(numberPicker.getValue());
+        upperText.setText(upperText.getText().toString() + " \n number of rounds: "+ numberPicker.getValue());
         showText("started decrypting using " + selectedCipher.getName());
         t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
     }
 
     public void onEncrypt(View v) {
-        EncryptTask t = new EncryptTask();
+        EncryptTask t = new EncryptTask(numberPicker.getValue());
+        upperText.setText(upperText.getText().toString() + " \n number of rounds: "+ numberPicker.getValue());
         showText("started encrypting using " + selectedCipher.getName());
         t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
     }

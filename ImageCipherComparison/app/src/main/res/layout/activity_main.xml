@@ -28,16 +28,21 @@
         android:onClick="onReloadFileList"
         android:text="load file list" />
 
+    <NumberPicker
+        android:id="@+id/numberPicker"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
+
     <TextView
         android:id="@+id/sample_text"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="81dp"
         android:text="Hello World!" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="114dp"
+        android:layout_height="79dp"
         android:text="Hello World!" />
 
     <LinearLayout
