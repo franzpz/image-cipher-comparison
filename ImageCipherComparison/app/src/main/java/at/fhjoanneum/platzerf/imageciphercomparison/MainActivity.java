@@ -22,7 +22,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -61,9 +64,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView lowerText;
     private EditText editText;
     private NumberPicker numberPicker;
+    private Spinner cipherselection;
 
     private Dictionary<String, String> filenamesToFullPath = new Hashtable<>();
     private Dictionary<String, ImageCipher> ciphers = new Hashtable<>();
+    private List<String> cipherList = new ArrayList<>();
     private List<String> testfiles = new ArrayList<String>();
     private String basePath = "/sdcard/Download/testimages/";
     private ImageCipher selectedCipher;
@@ -78,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
         lowerText = (TextView) findViewById(R.id.textView);
         editText = (EditText) findViewById(R.id.editText);
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
+
+        spinner = (Spinner)findViewById(R.id.spinner);
+        cipherselection = (Spinner)findViewById(R.id.cipherselection);
+
         numberPicker.setMinValue(0);
         numberPicker.setMaxValue(100);
 
@@ -86,6 +95,16 @@ public class MainActivity extends AppCompatActivity {
         ImageCipher one = new ImageCipher1();
         ciphers.put(one.getName(), one);
         selectedCipher = one;
+
+        Enumeration<ImageCipher> x = ciphers.elements();
+        while(x.hasMoreElements()){
+            cipherList.add(x.nextElement().getName());
+        }
+
+        ArrayAdapter<String> a = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item);
+        a.addAll(cipherList);
+        cipherselection.setAdapter(a);
 
         editText.setText(basePath);
         numberPicker.setValue(1);
@@ -113,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             testfiles.add(files[i].getName());
         }
 
-        spinner = (Spinner)findViewById(R.id.spinner);
+        Collections.sort(testfiles);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item);
@@ -218,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDecrypt(View v) {
+        selectedCipher = ciphers.get(cipherselection.getSelectedItem().toString());
         DecryptTask t = new DecryptTask(numberPicker.getValue());
         upperText.setText(upperText.getText().toString() + " \n number of rounds: "+ numberPicker.getValue());
         showText("started decrypting using " + selectedCipher.getName());
@@ -225,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onEncrypt(View v) {
+        selectedCipher = ciphers.get(cipherselection.getSelectedItem().toString());
         EncryptTask t = new EncryptTask(numberPicker.getValue());
         upperText.setText(upperText.getText().toString() + " \n number of rounds: "+ numberPicker.getValue());
         showText("started encrypting using " + selectedCipher.getName());
