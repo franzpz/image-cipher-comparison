@@ -17,13 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private int[] encryptedImageBytes;
 
     private int size = 50;
-    private String filename = "/sdcard/Download/testimages/" + (size*5) + "x" + (size*5) + "image.jpg";
+    private String filename = "/sdcard/Download/testimages/" + (size*5) + "x" + (size*5) + "image.png";
     private int height;
     private int width;
     private Bitmap.Config config;
@@ -89,6 +85,15 @@ public class MainActivity extends AppCompatActivity {
 
         verifyStoragePermissions(this);
 
+        loadFileList();
+
+        //upperText.setText("Original Image Bytes: " + arrayToStringList(originalImageBytes));
+
+        lowerText = (TextView) findViewById(R.id.textView);
+        lowerText.setText("do something...");
+    }
+
+    void loadFileList(){
         File directory = new File("/sdcard/Download/testimages/");
         File[] files = directory.listFiles();
         for (int i = 0; i < files.length; i++)
@@ -102,63 +107,19 @@ public class MainActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item);
         adapter.addAll(testfiles);
         spinner.setAdapter(adapter);
-
-
-
-        //upperText.setText("Original Image Bytes: " + arrayToStringList(originalImageBytes));
-
-        lowerText = (TextView) findViewById(R.id.textView);
-        lowerText.setText("do something...");
     }
 
-    void saveRgbIntArrayToImage(int[] convertedImage, String newFilename) {
-
-        Bitmap image = Bitmap.createBitmap(width, height, config);
-
-        int pos = 0;
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
-                image.setPixel(
-                    x,
-                    y,
-                    Color.rgb(
-                        convertedImage[pos*3],
-                        convertedImage[pos*3+1],
-                        convertedImage[pos*3+2])
-                );
-                pos++;
-            }
-        }
-
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(newFilename);
-            image.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
-    public void onLoadImage(View v) {
+    public void onReloadFileList(View v) {
+        loadFileList();
     }
 
     public void onDecrypt(View v) {
-        int[] decryptImageBytes = decryptImageBytes(encryptedImageBytes, sumOfImageBytes);
+        DecryptTask t = new DecryptTask();
+        Toast.makeText(this, "start decrypting", Toast.LENGTH_LONG).show();
+        String file = t.doInBackground(spinner.getSelectedItem().toString());
+        Toast.makeText(this, "done decrypting", Toast.LENGTH_LONG).show();
 
-        saveRgbIntArrayToImage(decryptImageBytes, filename + ".decrypted.jpg");
-
-        lowerText.setText("Decrypted successfully: " + arrayToStringList(decryptImageBytes));
+        lowerText.setText("Decrypted successfully: " + file);
     }
 
     private String arrayToStringList(int[] array) {
@@ -170,91 +131,42 @@ public class MainActivity extends AppCompatActivity {
         return s.toString();
     }
 
-    private class EncryptTask extends AsyncTask<String, Integer, String> {
-
-        private int[] originalImageBytes;
-
-        private long sumOfImageBytes = 0;
-
-        private int[] encryptedImageBytes;
-        private int height;
-        private int width;
-        private Bitmap.Config config;
+    private class DecryptTask extends AsyncTask<String, Integer, String> {
 
         @Override
         protected String doInBackground(String... params) {
             String filename = params[0];
+            String originalFile = filename.replace(".encrypted.png", "");
+            String newFilename = filename + ".decrypted.png";
 
-            loadImageIntoRgbIntArray(filename);
+            ImageConverter conv = new ImageConverter();
+            ConvertedImage originalImage = conv.GetOrigImageInfo(originalFile);
 
-            encryptedImageBytes = encryptImageBytes(originalImageBytes, sumOfImageBytes);
+            ConvertedImage encryptedImage = conv.ConvertFromArgbImage(filename);
 
-            saveRgbIntArrayToImage(encryptedImageBytes, filename + ".encrypted.jpg");
+            encryptedImage.ImageBytes = encryptImageBytes(encryptedImage.ImageBytes, originalImage.SumOfBytes);
 
-            return filename + ".encrypted.jpg";
+            conv.saveArgbImage(encryptedImage, newFilename);
+
+            return newFilename;
         }
+    }
 
-        void loadImageIntoRgbIntArray(String path){
-            Bitmap image = BitmapFactory.decodeFile(path);
+    private class EncryptTask extends AsyncTask<String, Integer, String> {
 
-            config = image.getConfig();
-            height = image.getHeight();
-            width = image.getWidth();
-            originalImageBytes = new int[image.getHeight()*image.getWidth()*3];
+        @Override
+        protected String doInBackground(String... params) {
+            String filename = params[0];
+            String newFilename = filename + ".encrypted.png";
 
-            int pos = 0;
-            for(int y = 0; y < image.getHeight(); y++) {
-                for(int x = 0; x < image.getWidth(); x++) {
-                    int pixel = image.getPixel(x, y);
-                    originalImageBytes[pos*3] = Color.red(pixel);
-                    originalImageBytes[pos*3+1] = Color.green(pixel);
-                    originalImageBytes[pos*3+2] = Color.blue(pixel);
-                    pos++;
-                }
-            }
+            ImageConverter conv = new ImageConverter();
+            ConvertedImage image = conv.ConvertFromArgbImage(filename);
 
-            encryptedImageBytes = new int[originalImageBytes.length];
+            image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
 
-            for(int i = 0; i < originalImageBytes.length; i++){
-                sumOfImageBytes += originalImageBytes[i];
-            }
-        }
+            conv.saveArgbImage(image, newFilename);
 
-        void saveRgbIntArrayToImage(int[] convertedImage, String newFilename) {
-
-            Bitmap image = Bitmap.createBitmap(width, height, config);
-
-            int pos = 0;
-            for(int y = 0; y < height; y++) {
-                for(int x = 0; x < width; x++) {
-                    image.setPixel(
-                            x,
-                            y,
-                            Color.rgb(
-                                    convertedImage[pos*3],
-                                    convertedImage[pos*3+1],
-                                    convertedImage[pos*3+2])
-                    );
-                    pos++;
-                }
-            }
-
-            FileOutputStream out = null;
-            try {
-                out = new FileOutputStream(newFilename);
-                image.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-                // PNG is a lossless format, the compression factor (100) is ignored
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            return newFilename;
         }
     }
 

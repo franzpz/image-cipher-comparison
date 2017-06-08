@@ -18,7 +18,7 @@ extern "C" {
 
 extern "C"
 void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sumOfBytes){
-    PermutationSetup *permSetups = (PermutationSetup*)malloc(sizeof(PermutationSetup)*4);
+    PermutationSetup permSetups[4];
 
     permSetups[0].r = 3.6000000001;
     permSetups[0].x = 0.8000000001;
@@ -32,37 +32,34 @@ void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sum
     permSetups[3].r = 3.6000000004;
     permSetups[3].x = 0.8000000004;
 
-    DiffusionSetup *diffuSetups = (DiffusionSetup*)malloc(sizeof(DiffusionSetup)*2);
+    DiffusionSetup diffuSetups[2];
 
-    diffuSetups[0].miu = 0.8597000122;
-    diffuSetups[0].x = 0.7733460001;
-    diffuSetups[0].y = 0.6543224322;
+    diffuSetups[0].miu = 0.600000000000001;
+    diffuSetups[0].x = 0.350000000000001;
+    diffuSetups[0].y = 0.350000000000002;
 
-    diffuSetups[1].miu = 0.84234123412;
-    diffuSetups[1].x = 0.78225545794;
-    diffuSetups[1].y = 0.66346604384;
+    diffuSetups[1].miu = 0.600000000000002;
+    diffuSetups[1].x = 0.360000000000001;
+    diffuSetups[1].y = 0.360000000000002;
 
     int encryptionRounds = 2;
 
     runAlgorithm(mode, imageBytes, length, sumOfBytes, permSetups, diffuSetups,  encryptionRounds);
-
-    free(permSetups);
-    free(diffuSetups);
 }
 
 void convertToUnsignedCharArray(unsigned char *convImageBytes, jint *imageBytes, long length) {
-//    log_info(TAG, "------- Provided Image -------");
+    log_info(TAG, "------- Provided Image -------");
     for(int i = 0; i < length; i++) {
         convImageBytes[i] = (unsigned char)imageBytes[i];
-        //log_info_f(TAG, "%d - %u", i, convImageBytes[i]);
+        log_info_f(TAG, "%d - %u", i, convImageBytes[i]);
     }
 }
 
 void convertToJintArray(unsigned char *convImageBytes, jint *imageBytes, long length) {
-    //log_info(TAG, "------- Converted Image -------");
+    log_info(TAG, "------- Converted Image -------");
     for(int i = 0; i < length; i++) {
         imageBytes[i] = convImageBytes[i];
-        //log_info_f(TAG, "%d - %u", i, imageBytes[i]);
+        log_info_f(TAG, "%d - %u", i, imageBytes[i]);
     }
 }
 

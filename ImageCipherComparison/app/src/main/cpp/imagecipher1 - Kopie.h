@@ -4,7 +4,7 @@
 #include <math.h>
 #include <android/log.h>
 
-//#define DEV 1
+#define DEV 1
 #define TEST 1
 
 #define log_error_f(tag,fmt,...) __android_log_print(ANDROID_LOG_ERROR,tag,fmt,__VA_ARGS__)
@@ -14,15 +14,15 @@
 #define log_warn(tag,fmt,...) __android_log_print(ANDROID_LOG_ERROR,tag,fmt,__VA_ARGS__)
 
 #ifdef DEV
-#define PTF(A,...) __android_log_print(ANDROID_LOG_INFO,"Ciphers",A,##__VA_ARGS__);
+    #define PTF(A,...) __android_log_print(ANDROID_LOG_INFO,"Ciphers",A,##__VA_ARGS__);
 #else
-#define PTF(A,...) do {} while(0);
+    #define PTF(A,...) do {} while(0);
 #endif
 
 #ifdef TEST
-#define PTF_IMPT(A,...) __android_log_print(ANDROID_LOG_INFO,"Ciphers",A,##__VA_ARGS__);
+    #define PTF_IMPT(A,...) __android_log_print(ANDROID_LOG_INFO,"Ciphers",A,##__VA_ARGS__);
 #else
-#define PTF_IMPT(A,...) do {} while(0);
+    #define PTF_IMPT(A,...) do {} while(0);
 #endif
 
 static int ENC_MODE = 1;
