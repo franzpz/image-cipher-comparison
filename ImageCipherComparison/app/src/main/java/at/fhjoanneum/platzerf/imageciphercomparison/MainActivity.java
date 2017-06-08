@@ -115,11 +115,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void onDecrypt(View v) {
         DecryptTask t = new DecryptTask();
-        Toast.makeText(this, "start decrypting", Toast.LENGTH_LONG).show();
-        String file = t.doInBackground(spinner.getSelectedItem().toString());
-        Toast.makeText(this, "done decrypting", Toast.LENGTH_LONG).show();
-
-        lowerText.setText("Decrypted successfully: " + file);
+        showText("started decrypting");
+        t.execute(spinner.getSelectedItem().toString());
     }
 
     private String arrayToStringList(int[] array) {
@@ -137,18 +134,27 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             String filename = params[0];
             String originalFile = filename.replace(".encrypted.png", "");
-            String newFilename = filename + ".decrypted.png";
+            String newFilename = originalFile + ".decrypted.png";
 
             ImageConverter conv = new ImageConverter();
             ConvertedImage originalImage = conv.GetOrigImageInfo(originalFile);
 
             ConvertedImage encryptedImage = conv.ConvertFromArgbImage(filename);
 
-            encryptedImage.ImageBytes = encryptImageBytes(encryptedImage.ImageBytes, originalImage.SumOfBytes);
+            long startTime = System.nanoTime();
+            encryptedImage.ImageBytes = decryptImageBytes(encryptedImage.ImageBytes, originalImage.SumOfBytes);
+            long endTime = System.nanoTime();
+
+            encryptedImage.Config = originalImage.Config;
 
             conv.saveArgbImage(encryptedImage, newFilename);
 
-            return newFilename;
+            return newFilename + "\n Took: " + ((endTime - startTime)/1000000000.0) + " seconds";
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            showText("Decrypted successfully: " + result);
         }
     }
 
@@ -162,21 +168,42 @@ public class MainActivity extends AppCompatActivity {
             ImageConverter conv = new ImageConverter();
             ConvertedImage image = conv.ConvertFromArgbImage(filename);
 
+            /*int[] origBytes = new int[]{201, 40, 208, 214, 53, 221, 216, 50, 220,
+                    200, 39, 207, 213, 52, 220, 216, 50, 220};
+
+            long sum = 0;
+            for(int i = 0; i < origBytes.length; i++) {
+                sum += origBytes[i];
+            }
+
+            int [] encrypted = encryptImageBytes(origBytes, sum);
+
+            int [] decrypted = decryptImageBytes(encrypted, sum);*/
+            //image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
+
+            long startTime = System.nanoTime();
             image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
+            long endTime = System.nanoTime();
 
             conv.saveArgbImage(image, newFilename);
 
-            return newFilename;
+            return newFilename + "\n Took: " + ((endTime - startTime)/1000000000.0) + " seconds";
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            showText("Encrypted successfully: " + result);
         }
     }
 
     public void onEncrypt(View v) {
         EncryptTask t = new EncryptTask();
-        Toast.makeText(this, "start encrypting", Toast.LENGTH_LONG).show();
-        String file = t.doInBackground(spinner.getSelectedItem().toString());
-        Toast.makeText(this, "done encrypting", Toast.LENGTH_LONG).show();
+        showText("started encrypting");
+        t.execute(spinner.getSelectedItem().toString());
+    }
 
-        lowerText.setText("Encrypted successfully: " + file);
+    public void showText(String text){
+        lowerText.setText(text);
     }
 
     /**

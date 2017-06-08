@@ -48,18 +48,18 @@ void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sum
 }
 
 void convertToUnsignedCharArray(unsigned char *convImageBytes, jint *imageBytes, long length) {
-    log_info(TAG, "------- Provided Image -------");
+    //log_info(TAG, "------- Provided Image -------");
     for(int i = 0; i < length; i++) {
         convImageBytes[i] = (unsigned char)imageBytes[i];
-        log_info_f(TAG, "%d - %u", i, convImageBytes[i]);
+        //log_info_f(TAG, "%d - %u", i, convImageBytes[i]);
     }
 }
 
 void convertToJintArray(unsigned char *convImageBytes, jint *imageBytes, long length) {
-    log_info(TAG, "------- Converted Image -------");
+    //log_info(TAG, "------- Converted Image -------");
     for(int i = 0; i < length; i++) {
         imageBytes[i] = convImageBytes[i];
-        log_info_f(TAG, "%d - %u", i, imageBytes[i]);
+        //log_info_f(TAG, "%d - %u", i, imageBytes[i]);
     }
 }
 
