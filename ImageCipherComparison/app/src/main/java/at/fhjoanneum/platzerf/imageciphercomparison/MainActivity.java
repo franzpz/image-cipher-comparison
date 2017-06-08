@@ -60,14 +60,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView lowerText;
     private EditText editText;
 
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
+
 
     private Dictionary<String, String> filenamesToFullPath = new Hashtable<>();
+    private Dictionary<String, ImageCipher> ciphers = new Hashtable<>();
     private List<String> testfiles = new ArrayList<String>();
     private String basePath = "/sdcard/Download/testimages/";
+    private ImageCipher selectedCipher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.editText);
 
         verifyStoragePermissions(this);
+
+        ImageCipher one = new ImageCipher1();
+        ciphers.put(one.getName(), one);
+        selectedCipher = one;
 
         editText.setText(basePath);
 
@@ -133,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
             long startTime = System.nanoTime();
             try {
-                encryptedImage.ImageBytes = decryptImageBytes(encryptedImage.ImageBytes, originalImage.SumOfBytes);
+                encryptedImage.ImageBytes = selectedCipher.decrypt(encryptedImage.ImageBytes, originalImage.SumOfBytes);
             }
             catch (Exception e){
                 return e.toString();
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result){
-            showText("Decrypted successfully: " + result);
+            showText("Decrypted successfully using " + selectedCipher.getName() + ": " + result);
         }
     }
 
@@ -178,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
             long startTime = System.nanoTime();
             try {
-                image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
+                image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes);
             }
             catch (Exception e){
                 return e.toString();
@@ -192,30 +195,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result){
-            showText("Encrypted successfully: " + result);
+            showText("Encrypted successfully using " + selectedCipher.getName() + ": " + result);
         }
     }
 
     public void onDecrypt(View v) {
         DecryptTask t = new DecryptTask();
-        showText("started decrypting");
+        showText("started decrypting using " + selectedCipher.getName());
         t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
     }
 
     public void onEncrypt(View v) {
         EncryptTask t = new EncryptTask();
-        showText("started encrypting");
+        showText("started encrypting using " + selectedCipher.getName());
         t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
     }
 
     public void showText(String text){
         lowerText.setText(text);
     }
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native int[] encryptImageBytes(int[] originalImageBytes, long sumOfImageBytes);
-    public native int[] decryptImageBytes(int[] originalImageBytes, long sumOfImageBytes);
 }

@@ -65,7 +65,7 @@ void convertToJintArray(unsigned char *convImageBytes, jint *imageBytes, long le
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_decryptImageBytes(JNIEnv *env,
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_decryptImageBytes(JNIEnv *env,
                                                                                  jobject instance,
                                                                                  jintArray originalImageBytes_,
                                                                                  jlong sumOfImageBytes) {
@@ -91,7 +91,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_decryptImageBytes
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_MainActivity_encryptImageBytes(JNIEnv *env,
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes(JNIEnv *env,
                                                                                  jobject instance,
                                                                                  jintArray originalImageBytes_,
                                                                                  jlong sumOfImageBytes) {
