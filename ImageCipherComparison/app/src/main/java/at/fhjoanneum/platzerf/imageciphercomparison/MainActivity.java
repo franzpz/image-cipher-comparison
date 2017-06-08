@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView upperText;
     private TextView lowerText;
+    private EditText editText;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -74,18 +76,23 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         upperText = (TextView) findViewById(R.id.sample_text);
+        lowerText = (TextView) findViewById(R.id.textView);
+        editText = (EditText) findViewById(R.id.editText);
 
         verifyStoragePermissions(this);
 
+        editText.setText(basePath);
+
         loadFileList();
+        spinner.requestFocus();
 
         //upperText.setText("Original Image Bytes: " + arrayToStringList(originalImageBytes));
 
-        lowerText = (TextView) findViewById(R.id.textView);
         lowerText.setText("do something...");
     }
 
     void loadFileList(){
+        basePath = editText.getText().toString();
         upperText.setText("Using Base Path: " + basePath);
 
         File directory = new File(basePath);
