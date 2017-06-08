@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -61,19 +63,9 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
-    private int[] originalImageBytes;
-
-    private long sumOfImageBytes = 0;
-
-    private int[] encryptedImageBytes;
-
-    private int size = 50;
-    private String filename = "/sdcard/Download/testimages/" + (size*5) + "x" + (size*5) + "image.png";
-    private int height;
-    private int width;
-    private Bitmap.Config config;
-
+    private Dictionary<String, String> filenamesToFullPath = new Hashtable<>();
     private List<String> testfiles = new ArrayList<String>();
+    private String basePath = "/sdcard/Download/testimages/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,11 +86,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void loadFileList(){
-        File directory = new File("/sdcard/Download/testimages/");
+        upperText.setText("Using Base Path: " + basePath);
+
+        File directory = new File(basePath);
         File[] files = directory.listFiles();
+
+        testfiles.clear();
+        filenamesToFullPath = new Hashtable<>();
         for (int i = 0; i < files.length; i++)
         {
-            testfiles.add(files[i].getAbsolutePath());
+            filenamesToFullPath.put(files[i].getName(), files[i].getAbsolutePath());
+            testfiles.add(files[i].getName());
         }
 
         spinner = (Spinner)findViewById(R.id.spinner);
@@ -111,21 +109,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onReloadFileList(View v) {
         loadFileList();
-    }
-
-    public void onDecrypt(View v) {
-        DecryptTask t = new DecryptTask();
-        showText("started decrypting");
-        t.execute(spinner.getSelectedItem().toString());
-    }
-
-    private String arrayToStringList(int[] array) {
-        StringBuilder s = new StringBuilder();
-        s.append("[");
-        for(int i = 0; i < 5; i++)
-            s.append(array[i]).append((i < array.length - 1 ? ", " : ""));
-        s.append("]");
-        return s.toString();
     }
 
     private class DecryptTask extends AsyncTask<String, Integer, String> {
@@ -206,10 +189,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onDecrypt(View v) {
+        DecryptTask t = new DecryptTask();
+        showText("started decrypting");
+        t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
+    }
+
     public void onEncrypt(View v) {
         EncryptTask t = new EncryptTask();
         showText("started encrypting");
-        t.execute(spinner.getSelectedItem().toString());
+        t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
     }
 
     public void showText(String text){
