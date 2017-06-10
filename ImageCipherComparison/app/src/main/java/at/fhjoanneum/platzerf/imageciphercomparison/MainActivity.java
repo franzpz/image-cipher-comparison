@@ -93,7 +93,9 @@ public class MainActivity extends AppCompatActivity {
         verifyStoragePermissions(this);
 
         ImageCipher one = new ImageCipher1();
+        ImageCipher two = new ImageCipher2();
         ciphers.put(one.getName(), one);
+        ciphers.put(two.getName(), two);
         selectedCipher = one;
 
         Enumeration<ImageCipher> x = ciphers.elements();
@@ -219,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 for(int i = 0; i < rounds; i++)
                     image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes);
+                image.ImageBytes = selectedCipher.decrypt(image.ImageBytes, image.SumOfBytes);
             }
             catch (Exception e){
                 return e.toString();

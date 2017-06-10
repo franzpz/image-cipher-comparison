@@ -24,6 +24,17 @@ add_library( # Sets the name of the library.
              )
 
 add_library( # Sets the name of the library.
+             imagecipher2
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             ${CPATH}imagecipher2.h
+             ${CPATH}imagecipher2.c
+             )
+
+add_library( # Sets the name of the library.
              native-lib
 
              # Sets the library as a shared library.
@@ -31,6 +42,15 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              ${CPATH}native-lib.cpp )
+
+add_library( # Sets the name of the library.
+             native-lib-cipher2
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             ${CPATH}native-lib-cipher2.cpp )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -55,9 +75,22 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib} )
 
+ target_link_libraries( # Specifies the target library.
+                        imagecipher2
+                        # Links the target library to the log library
+                        # included in the NDK.
+                        ${log-lib} )
+
 target_link_libraries( # Specifies the target library.
                        native-lib
                        imagecipher1
+                       # Links the target library to the log library
+                       # included in the NDK.
+                       ${log-lib} )
+
+target_link_libraries( # Specifies the target library.
+                       native-lib-cipher2
+                       imagecipher2
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
