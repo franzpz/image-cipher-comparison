@@ -18,7 +18,9 @@ public class ImageCipher2 implements ImageCipher {
 
     @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes) {
-        return encryptImageBytes(imageBytes);
+        int h = gmpTest(5);
+
+        return imageBytes;
     }
 
     @Override
@@ -32,4 +34,5 @@ public class ImageCipher2 implements ImageCipher {
      */
     public native int[] encryptImageBytes(int[] imageBytes);
     public native int[] decryptImageBytes(int[] imageBytes);
+    public native int gmpTest(int a);
 }

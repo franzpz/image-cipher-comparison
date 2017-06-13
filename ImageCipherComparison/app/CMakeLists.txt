@@ -11,6 +11,21 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 set( CPATH src/main/cpp/ )
+set(distribution_DIR ${CMAKE_SOURCE_DIR}/distribution/)
+
+add_library( libgmp
+             SHARED
+             IMPORTED )
+set_target_properties( # Specifies the target library.
+                       libgmp
+
+                       # Specifies the parameter you want to define.
+                       PROPERTIES IMPORTED_LOCATION
+
+                       # Provides the path to the library you want to import.
+                       ${distribution_DIR}gmp/${ANDROID_ABI}/libgmp.so )
+
+
 
 add_library( # Sets the name of the library.
              imagecipher1
@@ -52,6 +67,8 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              ${CPATH}native-lib-cipher2.cpp )
 
+
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -88,9 +105,13 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib} )
 
+target_include_directories(native-lib-cipher2 PRIVATE
+                           ${distribution_DIR}gmp/include)
+
 target_link_libraries( # Specifies the target library.
                        native-lib-cipher2
                        imagecipher2
+                       libgmp
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <android/log.h>
+#include "gmp.h"
 
 extern "C" {
     #include "imagecipher2.h"
@@ -94,6 +95,35 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_decryptImageBytes
     env->SetIntArrayRegion(imageBytes_, 0, len, imageBytes);
     env->ReleaseIntArrayElements(imageBytes_, imageBytes, 0);
     return imageBytes_;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_gmpTest(JNIEnv *env,
+                                                                       jobject instance, jint a) {
+    log_info("franz", "got in");
+
+    char *sum;
+
+    mpz_t r, c, b;
+    mpz_init(r);
+    mpz_init(c);
+    mpz_init(b);
+
+    mpz_set_ui(c, 2);
+    mpz_set_ui(b, 3);
+
+    mpz_add(r, c, b);
+
+
+
+    log_info_f("franz", "%s", (char*)mpz_get_str(NULL, 10, r));
+
+    mpz_clear(r);
+    mpz_clear(c);
+    mpz_clear(b);
+
+    return a;
 }
 
 /*

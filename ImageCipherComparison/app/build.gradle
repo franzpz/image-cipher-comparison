@@ -22,6 +22,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            // let gradle pack the shared library into apk
+            jniLibs.srcDirs = ['./distribution/gmp/']
+        }
+    }
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
