@@ -94,14 +94,20 @@ public class MainActivity extends AppCompatActivity {
 
         ImageCipher one = new ImageCipher1();
         ImageCipher two = new ImageCipher2();
+        ImageCipher oneGmp = new ImageCipher1Gmp();
+        ImageCipher twoGmp = new ImageCipher2Gmp();
         ciphers.put(one.getName(), one);
+        ciphers.put(oneGmp.getName(), oneGmp);
         ciphers.put(two.getName(), two);
+        ciphers.put(twoGmp.getName(), twoGmp);
         selectedCipher = one;
 
         Enumeration<ImageCipher> x = ciphers.elements();
         while(x.hasMoreElements()){
             cipherList.add(x.nextElement().getName());
         }
+
+        Collections.sort(cipherList);
 
         ArrayAdapter<String> a = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item);
@@ -221,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 for(int i = 0; i < rounds; i++)
                     image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes);
-                image.ImageBytes = selectedCipher.decrypt(image.ImageBytes, image.SumOfBytes);
+                //image.ImageBytes = selectedCipher.decrypt(image.ImageBytes, image.SumOfBytes);
             }
             catch (Exception e){
                 return e.toString();

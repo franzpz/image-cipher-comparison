@@ -66,7 +66,7 @@ void convertToJintArray(unsigned char *convImageBytes, jint *imageBytes, long le
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_decryptImageBytes(JNIEnv *env,
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_decryptImageBytesCipher1(JNIEnv *env,
                                                                                  jobject instance,
                                                                                  jintArray originalImageBytes_,
                                                                                  jlong sumOfImageBytes) {
@@ -92,7 +92,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_decryptImageBytes
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes(JNIEnv *env,
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytesCipher1(JNIEnv *env,
                                                                                  jobject instance,
                                                                                  jintArray originalImageBytes_,
                                                                                  jlong sumOfImageBytes) {
@@ -124,7 +124,7 @@ unsigned char iv[] = {
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_encryptImageBytes(JNIEnv *env,
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_encryptImageBytesCipher2(JNIEnv *env,
                                                                                  jobject instance,
                                                                                  jintArray imageBytes_) {
     jint *imageBytes = env->GetIntArrayElements(imageBytes_, NULL);
@@ -163,7 +163,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_encryptImageBytes
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_decryptImageBytes(JNIEnv *env,
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_decryptImageBytesCipher2(JNIEnv *env,
                                                                                  jobject instance,
                                                                                  jintArray imageBytes_) {
     jint *imageBytes = env->GetIntArrayElements(imageBytes_, NULL);

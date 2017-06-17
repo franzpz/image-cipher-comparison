@@ -238,16 +238,16 @@ void runAlgorithm(int mode, unsigned char *imageBytes, long numberOfImageBytes, 
 
                 PTF("\n----------- round %d after diffustion %ld [", i, k);
                 for(j = 0; j < numberOfImageBytes; j++) {
-                    tmpImageBytes[/*j*/permutationSequenceLogisticMap[k][j]] = imageBytes[j]^diffustionSequenceIkedaMap[k][j];
+                    tmpImageBytes[j/*permutationSequenceLogisticMap[k][j]*/] = imageBytes[j]^diffustionSequenceIkedaMap[k][j];
                     PTF("%u, ", tmpImageBytes[j]);
                 }
                 PTF("] \n");
-/*
+
                 PTF("\n----------- round %d after permutatio %d [", i, k);
                 for(j = 0; j < numberOfImageBytes; j++) {
                     imageBytes[permutationSequenceLogisticMap[k][j]] = tmpImageBytes[j];
                 }
-                for(j = 0; j < numberOfImageBytes; j++) {
+                /*for(j = 0; j < numberOfImageBytes; j++) {
                     PTF("%u, ", imageBytes[j]);
                 }
                 PTF("] \n");
