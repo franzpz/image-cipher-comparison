@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private Dictionary<String, ImageCipher> ciphers = new Hashtable<>();
     private List<String> cipherList = new ArrayList<>();
     private List<String> testfiles = new ArrayList<String>();
-    private String basePath = "/sdcard/Download/testimages/";
+    private String basePath = "/sdcard/Downloads/testimages/";
     private ImageCipher selectedCipher;
 
     @Override
@@ -96,10 +96,14 @@ public class MainActivity extends AppCompatActivity {
         ImageCipher two = new ImageCipher2();
         ImageCipher oneGmp = new ImageCipher1Gmp();
         ImageCipher twoGmp = new ImageCipher2Gmp();
+        ImageCipher aesJava = new AesJavaCipher();
+        ImageCipher twoJava = new ImageCipher2Java();
         ciphers.put(one.getName(), one);
         ciphers.put(oneGmp.getName(), oneGmp);
         ciphers.put(two.getName(), two);
         ciphers.put(twoGmp.getName(), twoGmp);
+        ciphers.put(aesJava.getName(), aesJava);
+        ciphers.put(twoJava.getName(), twoJava);
         selectedCipher = one;
 
         Enumeration<ImageCipher> x = ciphers.elements();
