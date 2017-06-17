@@ -92,7 +92,25 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              ${CPATH}native-lib-gmp.cpp )
 
+add_library( # Sets the name of the library.
+             native-lib-aes
 
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             ${CPATH}native-lib-aes.cpp )
+
+add_library( # Sets the name of the library.
+             aes
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             ${CPATH}tinyaes/aes.h
+             ${CPATH}tinyaes/aes.c
+             )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -110,6 +128,12 @@ find_library( # Sets the name of the path variable.
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
+
+target_link_libraries( # Specifies the target library.
+                       aes
+                       # Links the target library to the log library
+                       # included in the NDK.
+                       ${log-lib} )
 
 target_link_libraries( # Specifies the target library.
                        imagecipher1
@@ -156,3 +180,10 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
+
+target_link_libraries( # Specifies the target library.
+                      native-lib-aes
+                      aes
+                      # Links the target library to the log library
+                      # included in the NDK.
+                      ${log-lib} )

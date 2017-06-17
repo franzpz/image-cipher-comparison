@@ -98,12 +98,14 @@ public class MainActivity extends AppCompatActivity {
         ImageCipher twoGmp = new ImageCipher2Gmp();
         ImageCipher aesJava = new AesJavaCipher();
         ImageCipher twoJava = new ImageCipher2Java();
+        ImageCipher aesC = new AesCCipher();
         ciphers.put(one.getName(), one);
         ciphers.put(oneGmp.getName(), oneGmp);
         ciphers.put(two.getName(), two);
         ciphers.put(twoGmp.getName(), twoGmp);
         ciphers.put(aesJava.getName(), aesJava);
         ciphers.put(twoJava.getName(), twoJava);
+        ciphers.put(aesC.getName(), aesC);
         selectedCipher = one;
 
         Enumeration<ImageCipher> x = ciphers.elements();
