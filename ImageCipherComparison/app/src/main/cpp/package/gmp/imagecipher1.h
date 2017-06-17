@@ -4,8 +4,8 @@
 #include <math.h>
 #include "../../../../../distribution/gmp/include/gmp.h"
 
-#define DEV 1
-#define TEST 1
+//#define DEV 1
+//#define TEST 1
 
 #ifdef DEV
     #define PTF(A,...) gmp_printf(A,##__VA_ARGS__);

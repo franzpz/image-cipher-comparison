@@ -2,18 +2,23 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <android/log.h>
 
-#define DEV 1
-#define TEST 1
+#define log_error_f(tag,fmt,...) __android_log_print(ANDROID_LOG_ERROR,tag,fmt,__VA_ARGS__)
+#define log_error(tag,msg) __android_log_print(ANDROID_LOG_ERROR,tag,msg)
+#define log_info_f(tag,fmt,...) __android_log_print(ANDROID_LOG_INFO,tag,fmt,__VA_ARGS__)
+
+//#define DEV 1
+//#define TEST 1
 
 #ifdef DEV
-    #define PTF(A,...) printf(A,##__VA_ARGS__);
+    #define PTF(A,...) __android_log_print(ANDROID_LOG_INFO,"Ciphers",A,##__VA_ARGS__); //printf(A,##__VA_ARGS__);
 #else
     #define PTF(A,...) ;
 #endif
 
 #ifdef TEST
-    #define PTF_IMPT(A,...) printf(A,##__VA_ARGS__);
+    #define PTF_IMPT(A,...)  __android_log_print(ANDROID_LOG_INFO,"Ciphers",A,##__VA_ARGS__);;
 #else
     #define PTF_IMPT(A,...) ;
 #endif

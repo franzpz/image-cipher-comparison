@@ -5,9 +5,9 @@
 #include "../../../../../distribution/gmp/include/gmp.h"
 
 // when DEV is defined we get all output, useful for debugging
-#define DEV 1
+//#define DEV 1
 // when TEST is defined we get minimum output, to verify expectations
-#define TEST 1
+//#define TEST 1
 
 // use floating point standard for precision
 #ifndef __STDC_IEC_559__
