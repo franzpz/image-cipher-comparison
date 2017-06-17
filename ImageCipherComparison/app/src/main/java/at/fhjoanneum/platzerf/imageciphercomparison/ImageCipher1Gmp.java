@@ -4,15 +4,15 @@ package at.fhjoanneum.platzerf.imageciphercomparison;
  * Created by platzerf on 08.06.2017.
  */
 
-public class ImageCipher1 implements ImageCipher {
+public class ImageCipher1Gmp implements ImageCipher {
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("native-lib-gmp");
     }
 
     @Override
     public String getName() {
-        return "Image Cipher 1";
+        return "Image Cipher 1 GMP";
     }
 
     @Override

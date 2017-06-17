@@ -12,6 +12,9 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set( CPATH src/main/cpp/ )
 set(distribution_DIR ${CMAKE_SOURCE_DIR}/distribution/)
+set(PACKAGE ${CPATH}package/ )
+set(GMP ${PACKAGE}gmp/ )
+set(NONGMP ${PACKAGE}double/ )
 
 add_library( libgmp
              SHARED
@@ -34,8 +37,19 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             ${CPATH}imagecipher1.h
-             ${CPATH}imagecipher1.c
+             ${NONGMP}imagecipher1.h
+             ${NONGMP}imagecipher1.c
+             )
+
+add_library( # Sets the name of the library.
+             imagecipher1gmp
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             ${GMP}imagecipher1.h
+             ${GMP}imagecipher1.c
              )
 
 add_library( # Sets the name of the library.
@@ -45,8 +59,19 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             ${CPATH}imagecipher2.h
-             ${CPATH}imagecipher2.c
+             ${NONGMP}imagecipher2.h
+             ${NONGMP}imagecipher2.c
+             )
+
+add_library( # Sets the name of the library.
+             imagecipher2gmp
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             ${GMP}imagecipher2.h
+             ${GMP}imagecipher2.c
              )
 
 add_library( # Sets the name of the library.
@@ -59,13 +84,13 @@ add_library( # Sets the name of the library.
              ${CPATH}native-lib.cpp )
 
 add_library( # Sets the name of the library.
-             native-lib-cipher2
+             native-lib-gmp
 
              # Sets the library as a shared library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             ${CPATH}native-lib-cipher2.cpp )
+             ${CPATH}native-lib-gmp.cpp )
 
 
 
@@ -98,19 +123,35 @@ target_link_libraries( # Specifies the target library.
                         # included in the NDK.
                         ${log-lib} )
 
+ target_link_libraries( # Specifies the target library.
+                        imagecipher1gmp
+                        # Links the target library to the log library
+                        # included in the NDK.
+                         libgmp
+                        ${log-lib} )
+
+  target_link_libraries( # Specifies the target library.
+                         imagecipher2gmp
+                         # Links the target library to the log library
+                         # included in the NDK.
+                         libgmp
+                         ${log-lib} )
+
 target_link_libraries( # Specifies the target library.
                        native-lib
                        imagecipher1
+                       imagecipher2
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
 
-target_include_directories(native-lib-cipher2 PRIVATE
+target_include_directories(native-lib-gmp PRIVATE
                            ${distribution_DIR}gmp/include)
 
 target_link_libraries( # Specifies the target library.
-                       native-lib-cipher2
-                       imagecipher2
+                       native-lib-gmp
+                       imagecipher1gmp
+                       imagecipher2gmp
                        libgmp
                        # Links the target library to the log library
                        # included in the NDK.

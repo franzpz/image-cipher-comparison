@@ -5,7 +5,8 @@
 #include <android/log.h>
 
 extern "C" {
-    #include "imagecipher1.h"
+    #include "package/double/imagecipher1.h"
+    #include "package/double/imagecipher2.h"
 }
 
 #define log_error_f(tag,fmt,...) __android_log_print(ANDROID_LOG_ERROR,tag,fmt,__VA_ARGS__)
@@ -113,4 +114,88 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes
     env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
     env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
     return originalImageBytes_;
+}
+
+static char *key = (char *) "1234578901234567890123456789012";
+unsigned char iv[] = {
+        34, 45, 56, 78, 90, 12, 34, 23, 56, 78, 9, 3, 5, 23, 87,
+        3, 4, 5, 1, 9, 8, 34, 89, 34, 22, 93, 75, 76, 23, 16, 39, 53
+};
+
+extern "C"
+JNIEXPORT jintArray JNICALL
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_encryptImageBytes(JNIEnv *env,
+                                                                                 jobject instance,
+                                                                                 jintArray imageBytes_) {
+    jint *imageBytes = env->GetIntArrayElements(imageBytes_, NULL);
+    int len = env->GetArrayLength(imageBytes_);
+
+    AlgorithmParameter params = generateInitialContitions((unsigned char*)key);
+
+    int block = 0;
+    int blockPos;
+    int bytesProcessed = 0;
+
+    unsigned char buffer[BUFFER_SIZE];
+
+    while(bytesProcessed < len) {
+
+        blockPos = 0;
+        while(blockPos < BUFFER_SIZE && bytesProcessed < len) {
+            buffer[blockPos] = (unsigned char)imageBytes[bytesProcessed];
+            blockPos++;
+            bytesProcessed++;
+        }
+
+        encrypt(&params, buffer, blockPos, (unsigned char*)key, iv);
+
+        for(int i = 0; i < blockPos; i++){
+            imageBytes[block*BUFFER_SIZE+i] = buffer[i];
+        }
+
+        block++;
+    }
+
+    env->SetIntArrayRegion(imageBytes_, 0, len, imageBytes);
+    env->ReleaseIntArrayElements(imageBytes_, imageBytes, 0);
+    return imageBytes_;
+}
+
+extern "C"
+JNIEXPORT jintArray JNICALL
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_decryptImageBytes(JNIEnv *env,
+                                                                                 jobject instance,
+                                                                                 jintArray imageBytes_) {
+    jint *imageBytes = env->GetIntArrayElements(imageBytes_, NULL);
+    int len = env->GetArrayLength(imageBytes_);
+
+    AlgorithmParameter params = generateInitialContitions((unsigned char*)key);
+
+    int block = 0;
+    int blockPos;
+    int bytesProcessed = 0;
+
+    unsigned char buffer[BUFFER_SIZE];
+
+    while(bytesProcessed < len) {
+
+        blockPos = 0;
+        while(blockPos < BUFFER_SIZE && bytesProcessed < len) {
+            buffer[blockPos] = (unsigned char)imageBytes[bytesProcessed];
+            blockPos++;
+            bytesProcessed++;
+        }
+
+        decrypt(&params, buffer, blockPos, (unsigned char*)key, iv);
+
+        for(int i = 0; i < blockPos; i++){
+            imageBytes[block*BUFFER_SIZE+i] = buffer[i];
+        }
+
+        block++;
+    }
+
+    env->SetIntArrayRegion(imageBytes_, 0, len, imageBytes);
+    env->ReleaseIntArrayElements(imageBytes_, imageBytes, 0);
+    return imageBytes_;
 }

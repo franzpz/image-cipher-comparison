@@ -8,7 +8,7 @@ public class ImageCipher2 implements ImageCipher {
 
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("native-lib-cipher2");
+        System.loadLibrary("native-lib");
     }
 
     @Override
@@ -18,21 +18,18 @@ public class ImageCipher2 implements ImageCipher {
 
     @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes) {
-        int h = gmpTest(5);
-
-        return imageBytes;
+        return encryptImageBytesCipher2(imageBytes);
     }
 
     @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes) {
-        return decryptImageBytes(imageBytes);
+        return decryptImageBytesCipher2(imageBytes);
     }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native int[] encryptImageBytes(int[] imageBytes);
-    public native int[] decryptImageBytes(int[] imageBytes);
-    public native int gmpTest(int a);
+    public native int[] encryptImageBytesCipher2(int[] originalImageBytes);
+    public native int[] decryptImageBytesCipher2(int[] originalImageBytes);
 }
