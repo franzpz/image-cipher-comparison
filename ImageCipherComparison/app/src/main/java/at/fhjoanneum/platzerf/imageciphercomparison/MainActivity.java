@@ -152,6 +152,9 @@ public class MainActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item);
         adapter.addAll(testfiles);
         spinner.setAdapter(adapter);
+
+        CsvLogger.FlushLog();
+        CsvLogger.InitLogger(this.getApplicationContext(), basePath);
     }
 
     public void onReloadFileList(View v) {
@@ -160,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class DecryptTask extends AsyncTask<String, Integer, String> {
 
+        private String tag = "decrypt";
         private int rounds;
 
         public DecryptTask(int rounds){
@@ -172,24 +176,43 @@ public class MainActivity extends AppCompatActivity {
             String originalFile = filename.replace(".encrypted.png", "");
             String newFilename = originalFile + ".decrypted.png";
 
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "start reading files " + originalFile + "; " + filename);
+
             ImageConverter conv = new ImageConverter();
             ConvertedImage originalImage = conv.GetOrigImageInfo(originalFile);
 
             ConvertedImage encryptedImage = conv.ConvertFromArgbImage(filename);
 
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "end reading files " + originalFile + "; " + filename);
+
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "starting " + tag + " overall");
+
             long startTime = System.nanoTime();
             try {
-                for(int i = 0; i < rounds; i++)
+                for(int i = 0; i < rounds; i++) {
+                    CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "starting " + tag + " round " + (i+1));
+                    long startRound = System.nanoTime();
                     encryptedImage.ImageBytes = selectedCipher.decrypt(encryptedImage.ImageBytes, originalImage.SumOfBytes);
+                    long endRound = System.nanoTime();
+                    CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " round " + (i+1) + " - took: " + (endRound-startRound) + " ns");
+                }
             }
             catch (Exception e){
                 return e.toString();
             }
             long endTime = System.nanoTime();
 
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " overall - took: " + (endTime-startTime) + " ns");
+
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "start writing file " + newFilename);
+
             encryptedImage.Config = originalImage.Config;
 
             conv.saveArgbImage(encryptedImage, newFilename);
+
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done writing file " + newFilename);
+
+            CsvLogger.FlushLog();
 
             return newFilename + "\n Took: " + ((endTime - startTime)/1000000000.0) + " seconds";
         }
@@ -202,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class EncryptTask extends AsyncTask<String, Integer, String> {
 
+        private String tag = "encrypt";
         private int rounds;
 
         public EncryptTask(int rounds){
@@ -213,8 +237,12 @@ public class MainActivity extends AppCompatActivity {
             String filename = params[0];
             String newFilename = filename + ".encrypted.png";
 
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "start reading file " + filename);
+
             ImageConverter conv = new ImageConverter();
             ConvertedImage image = conv.ConvertFromArgbImage(filename);
+
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "end reading file " + filename);
 
             /*int[] origBytes = new int[]{201, 40, 208, 214, 53, 221, 216, 50, 220,
                     200, 39, 207, 213, 52, 220, 216, 50, 220};
@@ -229,18 +257,33 @@ public class MainActivity extends AppCompatActivity {
             int [] decrypted = decryptImageBytes(encrypted, sum);*/
             //image.ImageBytes = encryptImageBytes(image.ImageBytes, image.SumOfBytes);
 
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "starting " + tag + " overall");
+
             long startTime = System.nanoTime();
             try {
-                for(int i = 0; i < rounds; i++)
+                for(int i = 0; i < rounds; i++) {
+                    CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "starting " + tag + " round " + (i+1));
+                    long startRound = System.nanoTime();
                     image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes);
                 //image.ImageBytes = selectedCipher.decrypt(image.ImageBytes, image.SumOfBytes);
+                    long endRound = System.nanoTime();
+                    CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " round " + (i+1) + " - took: " + (endRound-startRound) + " ns");
+                }
             }
             catch (Exception e){
                 return e.toString();
             }
             long endTime = System.nanoTime();
 
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " overall - took: " + (endTime-startTime) + " ns");
+
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "start writing file " + newFilename);
+
             conv.saveArgbImage(image, newFilename);
+
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done writing file " + newFilename);
+
+            CsvLogger.FlushLog();
 
             return newFilename + "\n Took: " + ((endTime - startTime)/1000000000.0) + " seconds";
         }
