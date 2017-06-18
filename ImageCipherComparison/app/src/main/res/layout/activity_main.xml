@@ -26,12 +26,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/button"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onReloadFileList"
-        android:text="load file list" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onTestAes"
+            android:text="test aes" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onReloadFileList"
+            android:text="load list" />
+    </LinearLayout>
 
     <NumberPicker
         android:id="@+id/numberPicker"
@@ -42,12 +57,15 @@
         android:id="@+id/sample_text"
         android:layout_width="match_parent"
         android:layout_height="81dp"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical"
         android:text="Hello World!" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="79dp"
+        android:scrollbars="vertical"
         android:text="Hello World!" />
 
     <LinearLayout

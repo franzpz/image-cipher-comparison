@@ -24,7 +24,7 @@ public class AesJavaCipher implements ImageCipher {
 
     private Cipher init(int mode) {
         try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
 
             String key = "01234567890123456789012345678901";
             byte[] keyAsBytes = key.getBytes(encoding);

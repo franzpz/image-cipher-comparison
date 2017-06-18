@@ -3,9 +3,6 @@ package at.fhjoanneum.platzerf.imageciphercomparison;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,14 +13,10 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -159,6 +152,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void onReloadFileList(View v) {
         loadFileList();
+    }
+
+    /*public void onShowProviders(View v) {
+        String result = CipherProviderTests.policyTests();
+        upperText.setText(result);
+    }*/
+
+    public void onTestAes(View v) {
+        String result = CipherProviderTests.policyTests();
+        upperText.setText(result);
     }
 
     private class DecryptTask extends AsyncTask<String, Integer, String> {
