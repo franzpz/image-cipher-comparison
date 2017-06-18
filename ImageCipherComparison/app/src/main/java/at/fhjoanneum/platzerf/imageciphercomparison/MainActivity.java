@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,8 +14,10 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -129,7 +132,17 @@ public class MainActivity extends AppCompatActivity {
         upperText.setText("Using Base Path: " + basePath);
 
         File directory = new File(basePath);
-        File[] files = directory.listFiles();
+        if(!directory.isDirectory()) {
+            Toast.makeText(this, "directory does not exist", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        File[] files = directory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.getName().endsWith(".png");
+            }
+        });
 
         testfiles.clear();
         filenamesToFullPath = new Hashtable<>();
