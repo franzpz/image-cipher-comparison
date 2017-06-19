@@ -28,12 +28,12 @@ public class ImageCipher2 implements ImageCipher {
 
     @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
+        return encryptImageBytesCipher2Rounds(imageBytes, rounds);
     }
 
     @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
+        return decryptImageBytesCipher2Rounds(imageBytes, rounds);
     }
 
     /**
@@ -42,4 +42,6 @@ public class ImageCipher2 implements ImageCipher {
      */
     public native int[] encryptImageBytesCipher2(int[] originalImageBytes);
     public native int[] decryptImageBytesCipher2(int[] originalImageBytes);
+    public native int[] encryptImageBytesCipher2Rounds(int[] originalImageBytes, int rounds);
+    public native int[] decryptImageBytesCipher2Rounds(int[] originalImageBytes, int rounds);
 }

@@ -116,59 +116,6 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes
     env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
     return originalImageBytes_;
 }
-/*
-extern "C"
-JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_decryptImageBytesCipher1(JNIEnv *env,
-                                                                                        jobject instance,
-                                                                                        jintArray originalImageBytes_,
-                                                                                        jlong sumOfImageBytes) {
-    jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
-    long len = env->GetArrayLength(originalImageBytes_);
-
-    unsigned char *imageBytes = (unsigned char*)malloc(sizeof(unsigned char)*len);
-    long sumOfBytes = (long)sumOfImageBytes;
-
-    convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
-    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
-
-    useImageCipher1(DEC_MODE, imageBytes, len, sumOfBytes);
-
-    jint* convertedImageBytes = (jint*)malloc(sizeof(jint*)*len);
-    convertToJintArray(imageBytes, convertedImageBytes, len);
-    free(imageBytes);
-
-    env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
-    env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
-    return  originalImageBytes_;
-}
-
-
-extern "C"
-JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytesCipher1(JNIEnv *env,
-                                                                                 jobject instance,
-                                                                                 jintArray originalImageBytes_,
-                                                                                 jlong sumOfImageBytes) {
-    jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
-    int len = env->GetArrayLength(originalImageBytes_);
-
-    unsigned char *imageBytes = (unsigned char*)malloc(sizeof(unsigned char)*len);
-    long sumOfBytes = (long)sumOfImageBytes;
-
-    convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
-    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
-
-    useImageCipher1(ENC_MODE, imageBytes, len, sumOfBytes, 2);
-
-    jint* convertedImageBytes = (jint*)malloc(sizeof(jint*)*len);
-    convertToJintArray(imageBytes, convertedImageBytes, len);
-    free(imageBytes);
-
-    env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
-    env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
-    return originalImageBytes_;
-}*/
 
 static char *key = (char *) "1234578901234567890123456789012";
 unsigned char iv[] = {
@@ -260,6 +207,41 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_encryptImageBytes
                                                                                         jobject instance,
                                                                                         jintArray imageBytes_,
                                                                                         jint rounds) {
+    jint *imageBytes = env->GetIntArrayElements(imageBytes_, NULL);
+    int len = env->GetArrayLength(imageBytes_);
+
+    AlgorithmParameter params = generateInitialContitions((unsigned char*)key);
+
+    int block, blockPos, bytesProcessed;
+
+    unsigned char buffer[BUFFER_SIZE];
+
+    for(int r = 0; r < (int)rounds; r++) {
+
+        block = 0;
+        blockPos = 0;
+        bytesProcessed = 0;
+        while (bytesProcessed < len) {
+
+            blockPos = 0;
+            while (blockPos < BUFFER_SIZE && bytesProcessed < len) {
+                buffer[blockPos] = (unsigned char) imageBytes[bytesProcessed];
+                blockPos++;
+                bytesProcessed++;
+            }
+
+            encrypt(&params, buffer, blockPos, (unsigned char *) key, iv);
+
+            for (int i = 0; i < blockPos; i++) {
+                imageBytes[block * BUFFER_SIZE + i] = buffer[i];
+            }
+
+            block++;
+        }
+    }
+
+    env->SetIntArrayRegion(imageBytes_, 0, len, imageBytes);
+    env->ReleaseIntArrayElements(imageBytes_, imageBytes, 0);
     return imageBytes_;
 }
 
@@ -269,5 +251,40 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_decryptImageBytes
                                                                                         jobject instance,
                                                                                         jintArray imageBytes_,
                                                                                         jint rounds) {
+    jint *imageBytes = env->GetIntArrayElements(imageBytes_, NULL);
+    int len = env->GetArrayLength(imageBytes_);
+
+    AlgorithmParameter params = generateInitialContitions((unsigned char*)key);
+
+    int block, blockPos, bytesProcessed;
+
+    unsigned char buffer[BUFFER_SIZE];
+
+    for(int r = 0; r < (int)rounds; r++) {
+
+        block = 0;
+        blockPos = 0;
+        bytesProcessed = 0;
+        while (bytesProcessed < len) {
+
+            blockPos = 0;
+            while (blockPos < BUFFER_SIZE && bytesProcessed < len) {
+                buffer[blockPos] = (unsigned char) imageBytes[bytesProcessed];
+                blockPos++;
+                bytesProcessed++;
+            }
+
+            decrypt(&params, buffer, blockPos, (unsigned char *) key, iv);
+
+            for (int i = 0; i < blockPos; i++) {
+                imageBytes[block * BUFFER_SIZE + i] = buffer[i];
+            }
+
+            block++;
+        }
+    }
+
+    env->SetIntArrayRegion(imageBytes_, 0, len, imageBytes);
+    env->ReleaseIntArrayElements(imageBytes_, imageBytes, 0);
     return imageBytes_;
 }
