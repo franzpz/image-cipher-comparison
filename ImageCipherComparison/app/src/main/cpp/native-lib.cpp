@@ -1,5 +1,7 @@
 #include <jni.h>
 #include <string>
+#include <time.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <android/log.h>
@@ -16,6 +18,41 @@ extern "C" {
 #define log_warn(tag,fmt,...) __android_log_print(ANDROID_LOG_ERROR,tag,fmt,__VA_ARGS__)
 
 #define TAG "Ciphers C"
+
+#define NANOS_IN_SECOND 1000000000
+
+static long currentTimeInMs() {
+
+    struct timespec res;
+    clock_gettime(CLOCK_MONOTONIC, &res);
+
+    return lround(res.tv_nsec / 1.0e6) + res.tv_sec * 1000;
+}
+
+extern "C"
+JNIEXPORT jlongArray JNICALL
+Java_at_fhjoanneum_platzerf_imageciphercomparison_WaitTester_waitForSecondsInC(JNIEnv *env,
+                                                                               jclass type,
+                                                                               jlong seconds) {
+    int rounds = 30;
+    jlong startend[rounds];
+
+    for(int i = 0; i < rounds; i++) {
+        long start = currentTimeInMs();
+        sleep((unsigned int) seconds);
+        long end = currentTimeInMs();
+
+        startend[i*2] = start;
+        startend[i*2+1] = end;
+    }
+
+    jlongArray out_ints;
+    out_ints = env->NewLongArray(2);
+    env->SetLongArrayRegion(out_ints, 0, rounds*2, startend);
+
+    // returns data_ints as a jintArray
+    return out_ints;
+}
 
 extern "C"
 void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sumOfBytes, int rounds){
@@ -90,7 +127,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_decryptImageBytes
 }
 
 extern "C"
-JNIEXPORT jintArray JNICALL
+JNIEXPORT jlongArray JNICALL
 Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytesCipher1Rounds(JNIEnv *env,
                                                                                         jobject instance,
                                                                                         jintArray originalImageBytes_,
@@ -100,21 +137,48 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes
     jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
     int len = env->GetArrayLength(originalImageBytes_);
 
-    unsigned char *imageBytes = (unsigned char*)malloc(sizeof(unsigned char)*len);
-    long sumOfBytes = (long)sumOfImageBytes;
+    jlong measurements[rounds];
 
-    convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
-    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
+    long tmp;
+    int sleepTimeInSec = 25;
+    sleep(sleepTimeInSec);
 
-    useImageCipher1(ENC_MODE, imageBytes, len, sumOfBytes, (int)rounds);
+    for(int r = 0; r < rounds; r++) {
 
-    jint* convertedImageBytes = (jint*)malloc(sizeof(jint*)*len);
-    convertToJintArray(imageBytes, convertedImageBytes, len);
-    free(imageBytes);
+        tmp = currentTimeInMs();
+
+        unsigned char *imageBytes = (unsigned char *) malloc(sizeof(unsigned char) * len);
+        long sumOfBytes = (long) sumOfImageBytes;
+
+        convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
+
+        sumOfBytes = 0;
+        for (int i = 0; i < len; i++)
+            sumOfBytes += (long) imageBytes[i];
+
+        useImageCipher1(ENC_MODE, imageBytes, len, sumOfBytes, 1);
+
+
+        //convertToJintArray(imageBytes, convertedImageBytes, len);
+        free(imageBytes);
+
+        measurements[r] = currentTimeInMs() - tmp;
+    }
+
+    sleep(sleepTimeInSec);
+
+    /*jint *convertedImageBytes = (jint *) malloc(sizeof(jint *) * len);
 
     env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
     env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
-    return originalImageBytes_;
+     */
+
+    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
+
+    jlongArray out;
+    out = env->NewLongArray(rounds);
+    env->SetLongArrayRegion(out, 0, rounds, measurements);
+    return out;
 }
 
 static char *key = (char *) "1234578901234567890123456789012";

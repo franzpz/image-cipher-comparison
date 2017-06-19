@@ -23,6 +23,7 @@ public class CsvLogger {
 
     public static void InitLogger(Context context, String base) {
         CsvLogger.context = context;
+        base += "measurements";
 
         try {
             File gpxfile = new File(base, "csv-log-" + getCurrentTimeStamp() + ".csv");

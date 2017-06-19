@@ -61,13 +61,15 @@ public class MainActivity extends AppCompatActivity {
     private TextView lowerText;
     private EditText editText;
     private NumberPicker numberPicker;
+    private NumberPicker internalroundspicker;
+
     private Spinner cipherselection;
 
     private Dictionary<String, String> filenamesToFullPath = new Hashtable<>();
     private Dictionary<String, ImageCipher> ciphers = new Hashtable<>();
     private List<String> cipherList = new ArrayList<>();
     private List<String> testfiles = new ArrayList<String>();
-    private String basePath = "/sdcard/Downloads/testimages/";
+    private String basePath = "/sdcard/Download/testimages/";
     private ImageCipher selectedCipher;
 
     @Override
@@ -82,12 +84,15 @@ public class MainActivity extends AppCompatActivity {
         lowerText = (TextView) findViewById(R.id.textView);
         editText = (EditText) findViewById(R.id.editText);
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
+        internalroundspicker = (NumberPicker) findViewById(R.id.internalroundspicker);
 
         spinner = (Spinner)findViewById(R.id.spinner);
         cipherselection = (Spinner)findViewById(R.id.cipherselection);
 
-        numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(100);
+        numberPicker.setMinValue(1);
+        numberPicker.setMaxValue(150);
+        internalroundspicker.setMinValue(1);
+        internalroundspicker.setMaxValue(500);
 
         verifyStoragePermissions(this);
 
@@ -175,10 +180,27 @@ public class MainActivity extends AppCompatActivity {
         upperText.setText(result);
     }*/
 
+    public void onSleepTest(View v) {
+        upperText.setText("Starting wait for 30 rounds with 30 seconds per round");
+        String result = WaitTester.waitFor(30);
+        showText(result);
+    }
+
+
     public void onTestAes(View v) {
         String result = CipherProviderTests.policyTests();
         CsvLogger.AddLine("test cipher aes 256bit", "encrypt", "Provider Test", 1, result);
         upperText.setText(result);
+    }
+
+    private class TestCycle extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            return null;
+        }
+
+
     }
 
     private class DecryptTask extends AsyncTask<String, Integer, String> {
@@ -244,14 +266,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class EncryptTask extends AsyncTask<String, Integer, String> {
+    private class EncryptTask extends AsyncTask<String, String, String> {
 
+        private final int internalrounds;
         private String tag = "encrypt";
         private int rounds;
 
-        public EncryptTask(int rounds){
+        public EncryptTask(int rounds, int internalrounds){
             this.rounds = rounds;
+            this.internalrounds = internalrounds;
         }
+
+        protected void onProgressUpdate(String... progress) {
+            appendText(progress[0]);
+        }
+
 
         @Override
         protected String doInBackground(String... params) {
@@ -280,34 +309,49 @@ public class MainActivity extends AppCompatActivity {
 
             CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "starting " + tag + " overall");
 
-            long startTime = System.nanoTime();
+            long sumMillisecondsOverall = 0;
             try {
-                image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes, rounds);
-                /*for(int i = 0; i < rounds; i++) {
+                //image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes, rounds);
+                for(int i = 0; i < rounds; i++) {
+
+                    long sumMillisecondsPerRound = 0;
                     CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "starting " + tag + " round " + (i+1));
-                    long startRound = System.nanoTime();
-                    image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes, rounds);
+
+                    ImageCipher1 c = new ImageCipher1();
+                    long[] measurements = c.runEncTest(image.ImageBytes, image.SumOfBytes, this.internalrounds);
+
+                    for(int j = 0; j < internalrounds; j++){
+                        CsvLogger.AddLine(c.getName(), tag, filename, i, "internal round took " + measurements[j] + " ms ");
+                        sumMillisecondsPerRound += measurements[j];
+                    }
+
+                    sumMillisecondsOverall += sumMillisecondsPerRound;
+
+                    publishProgress("in round " + (i+1) + " and it took " + sumMillisecondsPerRound + " ms");
+
+                    CsvLogger.FlushLog();
+
+                    //image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes, rounds);
                 //image.ImageBytes = selectedCipher.decrypt(image.ImageBytes, image.SumOfBytes);
-                    long endRound = System.nanoTime();
-                    CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " round " + (i+1) + " - took: " + (endRound-startRound) + " ns");
-                }*/
+
+                    CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " round " + (i+1) + " - took: " + sumMillisecondsPerRound + " ms");
+                }
             }
             catch (Exception e){
                 return e.toString();
             }
-            long endTime = System.nanoTime();
 
-            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " overall - took: " + (endTime-startTime) + " ns");
+            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " overall - took: " + sumMillisecondsOverall + " ms");
 
             CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "start writing file " + newFilename);
 
-            conv.saveArgbImage(image, newFilename);
+            //conv.saveArgbImage(image, newFilename);
 
             CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done writing file " + newFilename);
 
             CsvLogger.FlushLog();
 
-            return newFilename + "\n Took: " + ((endTime - startTime)/1000000000.0) + " seconds";
+            return newFilename + "\n Took: " + sumMillisecondsOverall + " ms";
         }
 
         @Override
@@ -326,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onEncrypt(View v) {
         selectedCipher = ciphers.get(cipherselection.getSelectedItem().toString());
-        EncryptTask t = new EncryptTask(numberPicker.getValue());
+        EncryptTask t = new EncryptTask(numberPicker.getValue(), internalroundspicker.getValue());
         upperText.setText("number of rounds: "+ numberPicker.getValue());
         showText("started encrypting using " + selectedCipher.getName());
         t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
@@ -334,5 +378,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void showText(String text){
         lowerText.setText(text);
+    }
+
+    public void appendText(String text){
+        lowerText.setText(lowerText.getText() + "\n" + text);
     }
 }

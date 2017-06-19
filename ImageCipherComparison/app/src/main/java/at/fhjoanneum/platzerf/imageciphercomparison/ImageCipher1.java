@@ -27,6 +27,10 @@ public class ImageCipher1 implements ImageCipher {
 
     @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new int[1];
+    }
+
+    public long[] runEncTest(int[] imageBytes, long sumOfBytes, int rounds) {
         return encryptImageBytesCipher1Rounds(imageBytes, sumOfBytes, rounds);
     }
 
@@ -41,6 +45,6 @@ public class ImageCipher1 implements ImageCipher {
      */
     public native int[] encryptImageBytesCipher1(int[] originalImageBytes, long sumOfImageBytes);
     public native int[] decryptImageBytesCipher1(int[] originalImageBytes, long sumOfImageBytes);
-    public native int[] encryptImageBytesCipher1Rounds(int[] originalImageBytes, long sumOfImageBytes, int rounds);
+    public native long[] encryptImageBytesCipher1Rounds(int[] originalImageBytes, long sumOfImageBytes, int rounds);
     public native int[] decryptImageBytesCipher1Rounds(int[] originalImageBytes, long sumOfImageBytes, int rounds);
 }
