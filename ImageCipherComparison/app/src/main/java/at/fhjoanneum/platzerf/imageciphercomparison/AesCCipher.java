@@ -28,14 +28,17 @@ public class AesCCipher implements ImageCipher {
 
     @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
+
+        return encryptImageBytesAesCRounds(imageBytes, rounds);
     }
 
     @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
+        return decryptImageBytesAesCRounds(imageBytes, rounds);
     }
 
     public native int[] encryptImageBytesAesC(int[] originalImageBytes);
     public native int[] decryptImageBytesAesC(int[] originalImageBytes);
+    public native int[] encryptImageBytesAesCRounds(int[] originalImageBytes, int rounds);
+    public native int[] decryptImageBytesAesCRounds(int[] originalImageBytes, int rounds);
 }
