@@ -26,6 +26,16 @@ public class ImageCipher2Gmp implements ImageCipher {
         return decryptImageBytesCipher2(imageBytes);
     }
 
+    @Override
+    public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new int[0];
+    }
+
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.

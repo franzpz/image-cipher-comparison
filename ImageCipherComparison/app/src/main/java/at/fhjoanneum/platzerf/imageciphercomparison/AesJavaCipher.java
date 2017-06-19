@@ -96,4 +96,14 @@ public class AesJavaCipher implements ImageCipher {
 
         return imageBytes;
     }
+
+    @Override
+    public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new int[0];
+    }
 }

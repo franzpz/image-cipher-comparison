@@ -53,6 +53,16 @@ public class ImageCipher2Java implements ImageCipher {
         return imageBytes;
     }
 
+    @Override
+    public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new int[0];
+    }
+
     public class AlgoParams {
         public double X = 0.0;
         public int C = 0;
