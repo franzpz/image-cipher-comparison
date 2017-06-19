@@ -27,18 +27,19 @@ public class ImageCipher1Gmp implements ImageCipher {
 
     @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
+        return encryptImageBytesCipher1Rounds(imageBytes, sumOfBytes, rounds);
     }
 
     @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
+        return decryptImageBytesCipher1Rounds(imageBytes, sumOfBytes, rounds);
     }
-
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
     public native int[] encryptImageBytesCipher1(int[] originalImageBytes, long sumOfImageBytes);
     public native int[] decryptImageBytesCipher1(int[] originalImageBytes, long sumOfImageBytes);
+    public native int[] encryptImageBytesCipher1Rounds(int[] originalImageBytes, long sumOfImageBytes, int rounds);
+    public native int[] decryptImageBytesCipher1Rounds(int[] originalImageBytes, long sumOfImageBytes, int rounds);
 }
