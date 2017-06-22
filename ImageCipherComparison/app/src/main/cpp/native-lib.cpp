@@ -140,7 +140,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes
     jlong measurements[rounds];
 
     long tmp;
-    int sleepTimeInSec = 25;
+    int sleepTimeInSec = 1;
     sleep(sleepTimeInSec);
 
     for(int r = 0; r < rounds; r++) {

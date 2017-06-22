@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -278,7 +277,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         protected void onProgressUpdate(String... progress) {
-            appendText(progress[0]);
+
+            prependText(progress[0]);
         }
 
 
@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
                     //image.ImageBytes = selectedCipher.encrypt(image.ImageBytes, image.SumOfBytes, rounds);
                 //image.ImageBytes = selectedCipher.decrypt(image.ImageBytes, image.SumOfBytes);
 
-                    CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done " + tag + " round " + (i+1) + " - took: " + sumMillisecondsPerRound + " ms");
+
                 }
             }
             catch (Exception e){
@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
 
             //conv.saveArgbImage(image, newFilename);
 
-            CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done writing file " + newFilename);
+            //CsvLogger.AddLine(selectedCipher.getName(), tag, filename, rounds, "done writing file " + newFilename);
 
             CsvLogger.FlushLog();
 
@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
         lowerText.setText(text);
     }
 
-    public void appendText(String text){
-        lowerText.setText(lowerText.getText() + "\n" + text);
+    public void prependText(String text){
+        lowerText.setText(  text + "\n" + lowerText.getText());
     }
 }
