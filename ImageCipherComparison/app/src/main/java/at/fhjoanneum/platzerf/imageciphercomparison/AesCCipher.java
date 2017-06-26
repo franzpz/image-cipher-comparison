@@ -33,10 +33,21 @@ public class AesCCipher implements ImageCipher {
     }
 
     @Override
+    public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+        return runAesCLong(imageBytes, rounds, Constants.SleepTimeBetweenRoundsInSeconds, 1);
+    }
+
+    @Override
+    public long[] decryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+        return runAesCLong(imageBytes, rounds, Constants.SleepTimeBetweenRoundsInSeconds, 2);
+    }
+
+    @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
         return decryptImageBytesAesCRounds(imageBytes, rounds);
     }
 
+    public native long[] runAesCLong(int[] imageBytes, int rounds, int sleepInSeconds, int mode); // 1 = enc, 2 = dec
     public native int[] encryptImageBytesAesC(int[] originalImageBytes);
     public native int[] decryptImageBytesAesC(int[] originalImageBytes);
     public native int[] encryptImageBytesAesCRounds(int[] originalImageBytes, int rounds);

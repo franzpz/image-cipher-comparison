@@ -5,7 +5,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +37,7 @@ public class CsvLogger {
             writer.close();
         } catch (Exception e) {
             Log.e("Ciphers", "logging failed", e);
+            Toast.makeText(context, "failed logger: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -47,16 +50,18 @@ public class CsvLogger {
             return;
 
         try {
-            File gpxfile = new File(currentFile);
-
-            FileWriter writer = new FileWriter(gpxfile);
+            FileOutputStream out = new FileOutputStream(currentFile, true);
+            OutputStreamWriter writer = new OutputStreamWriter(out);
             for(int i = 0; i < logCache.size(); i++)
                 writer.append(logCache.get(i));
             writer.flush();
             writer.close();
+            out.flush();
+            out.close();
             logCache.clear();
         } catch (Exception e) {
             Log.e("Ciphers", "logging failed", e);
+            Toast.makeText(context, "failed logger: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

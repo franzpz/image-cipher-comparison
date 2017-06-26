@@ -31,6 +31,16 @@ public class ImageCipher1Gmp implements ImageCipher {
     }
 
     @Override
+    public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new long[0];
+    }
+
+    @Override
+    public long[] decryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+        return new long[0];
+    }
+
+    @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
         return decryptImageBytesCipher1Rounds(imageBytes, sumOfBytes, rounds);
     }

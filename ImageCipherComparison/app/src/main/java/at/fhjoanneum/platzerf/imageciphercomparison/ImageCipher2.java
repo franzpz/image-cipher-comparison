@@ -32,6 +32,17 @@ public class ImageCipher2 implements ImageCipher {
     }
 
     @Override
+    public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+
+        return runImageBytesCipher2Long(imageBytes, rounds, Constants.SleepTimeBetweenRoundsInSeconds, 1);
+    }
+
+    @Override
+    public long[] decryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+        return runImageBytesCipher2Long(imageBytes, rounds, Constants.SleepTimeBetweenRoundsInSeconds, 2);
+    }
+
+    @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
         return decryptImageBytesCipher2Rounds(imageBytes, rounds);
     }
@@ -44,4 +55,5 @@ public class ImageCipher2 implements ImageCipher {
     public native int[] decryptImageBytesCipher2(int[] originalImageBytes);
     public native int[] encryptImageBytesCipher2Rounds(int[] originalImageBytes, int rounds);
     public native int[] decryptImageBytesCipher2Rounds(int[] originalImageBytes, int rounds);
+    public native long[] runImageBytesCipher2Long(int[] originalImageBytes, int rounds, int sleepInSeconds, int mode); //1 = enc, 2 = dec
 }

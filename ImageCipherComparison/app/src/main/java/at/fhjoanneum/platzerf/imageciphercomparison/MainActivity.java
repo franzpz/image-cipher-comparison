@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
@@ -25,6 +27,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
+import android.os.Process;
+
 public class MainActivity extends AppCompatActivity {
 
     // Storage Permissions
@@ -37,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Checks if the app has permission to write to device storage
-     *
+     * <p>
      * If the app does not has permission then the user will be prompted to grant permissions
      *
      * @param activity
@@ -56,13 +62,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private TextView upperText;
     private TextView lowerText;
     private EditText editText;
     private NumberPicker numberPicker;
     private NumberPicker internalroundspicker;
-
-    private Spinner cipherselection;
 
     private Dictionary<String, String> filenamesToFullPath = new Hashtable<>();
     private Dictionary<String, ImageCipher> ciphers = new Hashtable<>();
@@ -79,14 +82,12 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Example of a call to a native method
-        upperText = (TextView) findViewById(R.id.sample_text);
         lowerText = (TextView) findViewById(R.id.textView);
         editText = (EditText) findViewById(R.id.editText);
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
         internalroundspicker = (NumberPicker) findViewById(R.id.internalroundspicker);
 
-        spinner = (Spinner)findViewById(R.id.spinner);
-        cipherselection = (Spinner)findViewById(R.id.cipherselection);
+        spinner = (Spinner) findViewById(R.id.spinner);
 
         numberPicker.setMinValue(1);
         numberPicker.setMaxValue(150);
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         selectedCipher = one;
 
         Enumeration<ImageCipher> x = ciphers.elements();
-        while(x.hasMoreElements()){
+        while (x.hasMoreElements()) {
             cipherList.add(x.nextElement().getName());
         }
 
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> a = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item);
         a.addAll(cipherList);
-        cipherselection.setAdapter(a);
+        //cipherselection.setAdapter(a);
 
         editText.setText(basePath);
         numberPicker.setValue(1);
@@ -134,12 +135,12 @@ public class MainActivity extends AppCompatActivity {
         lowerText.setText("do something...");
     }
 
-    void loadFileList(){
+    void loadFileList() {
         basePath = editText.getText().toString();
-        upperText.setText("Using Base Path: " + basePath);
+        prependText("Using Base Path: " + basePath);
 
         File directory = new File(basePath);
-        if(!directory.isDirectory()) {
+        if (!directory.isDirectory()) {
             Toast.makeText(this, "directory does not exist", Toast.LENGTH_LONG).show();
             return;
         }
@@ -153,8 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
         testfiles.clear();
         filenamesToFullPath = new Hashtable<>();
-        for (int i = 0; i < files.length; i++)
-        {
+        for (int i = 0; i < files.length; i++) {
             filenamesToFullPath.put(files[i].getName(), files[i].getAbsolutePath());
             testfiles.add(files[i].getName());
         }
@@ -179,27 +179,198 @@ public class MainActivity extends AppCompatActivity {
         upperText.setText(result);
     }*/
 
-    public void onSleepTest(View v) {
-        upperText.setText("Starting wait for 30 rounds with 30 seconds per round");
-        String result = WaitTester.waitFor(30);
-        showText(result);
+    public void onRunAll(View v) {
+        run(3);
     }
 
+    public void onRunEnc(View v) {
+        run(1);
+    }
+
+    public void onRunDec(View v) {
+        run(2);
+    }
+
+    private void run(int types) { // 1 = enc, 2 = dec, 3 = both
+        final int externalRounds = numberPicker.getValue();
+        final int internalRounds = internalroundspicker.getValue();
+        //lowerText.setText("");
+        //showText("Starting run all for " + externalRounds + "x" + internalRounds);
+
+        ((Activity) this).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((EditText) editText).setText("Starting run all for " + externalRounds + "x" + internalRounds);
+            }
+        });
+
+        showText("Started with Run All");
+
+        new LongAsyncRunner(getSelectedCiphers(), getSelectedImages())
+                .doInBackground(externalRounds, internalRounds, types); // run both enc/dec
+    }
+
+    private List<String> getSelectedImages(){
+        List<String> images = new ArrayList<>();
+        images.add(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
+        return images;
+    }
+
+    private List<ImageCipher> getSelectedCiphers(){
+        List<ImageCipher> imageCiphersToRun = new ArrayList<>();
+
+        if(((CheckBox)this.findViewById(R.id.aesC)).isChecked()){
+            imageCiphersToRun.add(new AesCCipher());
+        }
+        if(((CheckBox)this.findViewById(R.id.aesJava)).isChecked()){
+            imageCiphersToRun.add(new AesJavaCipher());
+        }
+        if(((CheckBox)this.findViewById(R.id.imageCipher1)).isChecked()){
+            imageCiphersToRun.add(new ImageCipher1());
+        }
+        if(((CheckBox)this.findViewById(R.id.imageCipher2)).isChecked()){
+            imageCiphersToRun.add(new ImageCipher2());
+        }
+
+        return imageCiphersToRun;
+    }
+
+    public class LongAsyncRunner extends AsyncTask<Integer, String, String> {
+
+        private List<ImageCipher> imageCiphersToRun;
+        private List<String> imagesToRun;
+
+        public LongAsyncRunner(List<ImageCipher> imageCiphers, List<String> images){
+            imageCiphersToRun = imageCiphers;
+            imagesToRun = images;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... progress) {
+            prependText(progress[0]);
+        }
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
+
+            int externalRounds = params[0];
+            int internalRounds = params[1];
+
+            int type = 0;
+            int typesToRun = 0;
+
+            if(params[2] == 3) {
+                type = 0;
+                typesToRun = 2; // enc & dec
+            }
+            else if(params[2] == 2){
+                type = 1;
+                typesToRun = 2; // nur dec
+            }
+            else if(params[2] == 1){
+                type = 0;
+                typesToRun = 1; // nur enc
+            }
+
+            ImageConverter conv = new ImageConverter();
+
+            CsvLogger.AddLine("-", "-", "-", 0, "running for " + externalRounds + " ext rounds and " + internalRounds + " internal rounds");
+
+            for(;type < typesToRun; type++) {
+                // log starting type
+
+                publishProgress("doing " + (type == 0 ? "encrypt" : "decrypt"));
+
+                CsvLogger.AddLine("-", type == 0 ? "encrypt" : "decrypt", "-", 0, "start for images");
+
+                for(int imagesCounter = 0; imagesCounter < imagesToRun.size(); imagesCounter++) {
+
+                    // load Image = async
+                    String filename = imagesToRun.get(imagesCounter);
+                    ConvertedImage newImage = conv.ConvertFromArgbImage(filename);
+                    String newFilename = "";
+                    long sumOfBytes = 0;
+
+                    if(filename.contains("encrypted") && type == 1) {
+                        String originalFile = filename.replace(".encrypted.png", "");
+                        newFilename = originalFile + ".decrypted.png";
+                        ConvertedImage originalImage = conv.GetOrigImageInfo(originalFile);
+                        sumOfBytes = originalImage.SumOfBytes;
+                    }
+                    else if(type == 0) {
+                        newFilename = filename + ".encrypted.png";
+                    }
+
+                    publishProgress("working on image: " + filename);
+                    CsvLogger.AddLine("-", type == 0 ? "encrypt" : "decrypt", filename, 0, "done loading image");
+
+                    for (int i = 0; i < imageCiphersToRun.size(); i++) {
+
+                        SystemClock.sleep((int)(Constants.SleepTimeBetweenRoundsInSeconds*1.5*1000));
+
+                        ImageCipher curr = imageCiphersToRun.get(i);
+
+                        // log starting cipher
+                        publishProgress("working on cipher: " + curr.getName());
+                        CsvLogger.AddLine(curr.getName(), type == 0 ? "encrypt" : "decrypt", filename, 0, "starting external rounds");
+                        long[] measurements = new long[0];
+
+                        for (int extRound = 0; extRound < externalRounds; extRound++) {
+                            // log ext round
+                            CsvLogger.AddLine(curr.getName(), type == 0 ? "encrypt" : "decrypt", filename, extRound, "starting round");
+
+                            long startTime = System.nanoTime();
+
+                            if (type == 0)
+                                measurements = curr.encryptLong(newImage.ImageBytes, sumOfBytes, internalRounds);
+                            else if (type == 1){
+                                measurements = curr.decryptLong(newImage.ImageBytes, sumOfBytes, internalRounds);
+                            }
+
+                            long endTime = System.nanoTime();
+
+                            for(int r = 0; r < measurements.length; r++){
+                                CsvLogger.AddLine(curr.getName(), "times for inner round in ms", filename, r, measurements[r] + "");
+                            }
+                            //r = curr.decrypt(imageBytes, internalRounds);
+
+                            CsvLogger.AddLine(curr.getName(), "times for ext round in ms", filename, extRound, (endTime-startTime)/1000000 + "");
+                            publishProgress("done cipher " + curr.getName() + ", took " + (endTime-startTime)/1000000 + " ms");
+                            CsvLogger.FlushLog();
+                        }
+
+                        CsvLogger.AddLine(curr.getName(), type == 0 ? "encrypt" : "decrypt", filename, 0, "done with cipher");
+                        // flush logs
+                    }
+
+                    CsvLogger.AddLine("-", type == 0 ? "encrypt" : "decrypt", filename, 0, "done with image");
+                }
+
+                // log type done
+                publishProgress("done with mode: " + (type == 0 ? "encrypt" : "decrypt"));
+                CsvLogger.AddLine("-", type == 0 ? "encrypt" : "decrypt", "-", 0, "done with mode");
+                CsvLogger.FlushLog();
+                // flush logs
+            }
+
+            publishProgress("done with LongAsyncTask");
+            CsvLogger.FlushLog();
+
+            return "";
+        }
+    }
+
+    public void onSleepTest(View v) {
+        showText("Starting wait for 30 rounds with 30 seconds per round");
+        String result = WaitTester.waitFor(30);
+        prependText(result);
+    }
 
     public void onTestAes(View v) {
         String result = CipherProviderTests.policyTests();
         CsvLogger.AddLine("test cipher aes 256bit", "encrypt", "Provider Test", 1, result);
-        upperText.setText(result);
-    }
-
-    private class TestCycle extends AsyncTask<String, Integer, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            return null;
-        }
-
-
+        prependText(result);
     }
 
     private class DecryptTask extends AsyncTask<String, Integer, String> {
@@ -360,27 +531,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onDecrypt(View v) {
-        selectedCipher = ciphers.get(cipherselection.getSelectedItem().toString());
-        DecryptTask t = new DecryptTask(numberPicker.getValue());
-        upperText.setText("number of rounds: "+ numberPicker.getValue());
-        showText("started decrypting using " + selectedCipher.getName());
-        t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
-    }
-
-    public void onEncrypt(View v) {
-        selectedCipher = ciphers.get(cipherselection.getSelectedItem().toString());
-        EncryptTask t = new EncryptTask(numberPicker.getValue(), internalroundspicker.getValue());
-        upperText.setText("number of rounds: "+ numberPicker.getValue());
-        showText("started encrypting using " + selectedCipher.getName());
-        t.execute(filenamesToFullPath.get(spinner.getSelectedItem().toString()));
-    }
-
     public void showText(String text){
         lowerText.setText(text);
     }
 
     public void prependText(String text){
+        if(lowerText.getText().length() > 300)
+            lowerText.setText("");
+
         lowerText.setText(  text + "\n" + lowerText.getText());
     }
 }

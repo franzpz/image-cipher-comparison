@@ -1,5 +1,7 @@
 package at.fhjoanneum.platzerf.imageciphercomparison;
 
+import android.os.SystemClock;
+
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.BadPaddingException;
@@ -100,6 +102,89 @@ public class AesJavaCipher implements ImageCipher {
     @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
         return new int[0];
+    }
+
+    @Override
+    public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+
+        long[] measurements = new long[rounds];
+        long start;
+
+        try {
+
+            SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+
+            for (int r = 0; r < rounds; r++) {
+
+                start = System.currentTimeMillis();
+
+                cipherDec = init(Cipher.ENCRYPT_MODE);
+
+                byte[] inputBytes = new byte[imageBytes.length];
+                for (int i = 0; i < imageBytes.length; i++)
+                    inputBytes[i] = (byte) imageBytes[i];
+
+                try {
+                    inputBytes = cipherDec.doFinal(inputBytes);
+                } catch (Exception e) {
+                    throw new IllegalStateException("AES decryption failed", e);
+                }
+
+                for(int i = 0; i < imageBytes.length; i++)
+                    imageBytes[i] = inputBytes[i] < 0 ? ((int)inputBytes[i]) + 256 : inputBytes[i];
+
+                measurements[r] = System.currentTimeMillis() - start;
+            }
+
+            SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+        }
+        catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
+
+        return measurements;
+    }
+
+    @Override
+    public long[] decryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
+
+        long[] measurements = new long[rounds];
+        long start;
+
+        try {
+
+            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+
+            for (int r = 0; r < rounds; r++) {
+
+                start = System.currentTimeMillis();
+
+                cipherEnc = init(Cipher.DECRYPT_MODE);
+
+                byte[] inputBytes = new byte[imageBytes.length];
+                for (int i = 0; i < imageBytes.length; i++)
+                    inputBytes[i] = (byte) imageBytes[i];
+
+                try {
+                    inputBytes = cipherEnc.doFinal(inputBytes);
+                } catch (Exception e) {
+                    throw new IllegalStateException("AES encryption failed", e);
+                }
+
+                for(int i = 0; i < imageBytes.length; i++)
+                    imageBytes[i] = inputBytes[i] < 0 ? ((int)inputBytes[i]) + 256 : inputBytes[i];
+
+                measurements[r] = System.currentTimeMillis() - start;
+            }
+
+            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+        }
+        catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
+
+        return measurements;
+
     }
 
     @Override
