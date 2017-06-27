@@ -116,7 +116,7 @@ public class AesJavaCipher implements ImageCipher {
 
             for (int r = 0; r < rounds; r++) {
 
-                start = System.currentTimeMillis();
+                start = System.nanoTime();
 
                 cipherDec = init(Cipher.ENCRYPT_MODE);
 
@@ -133,7 +133,7 @@ public class AesJavaCipher implements ImageCipher {
                 for(int i = 0; i < imageBytes.length; i++)
                     imageBytes[i] = inputBytes[i] < 0 ? ((int)inputBytes[i]) + 256 : inputBytes[i];
 
-                measurements[r] = System.currentTimeMillis() - start;
+                measurements[r] = (System.nanoTime() - start)/1000000;
             }
 
             SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
@@ -159,14 +159,14 @@ public class AesJavaCipher implements ImageCipher {
 
                 start = System.currentTimeMillis();
 
-                cipherEnc = init(Cipher.DECRYPT_MODE);
+                cipherDec = init(Cipher.DECRYPT_MODE);
 
                 byte[] inputBytes = new byte[imageBytes.length];
                 for (int i = 0; i < imageBytes.length; i++)
                     inputBytes[i] = (byte) imageBytes[i];
 
                 try {
-                    inputBytes = cipherEnc.doFinal(inputBytes);
+                    inputBytes = cipherDec.doFinal(inputBytes);
                 } catch (Exception e) {
                     throw new IllegalStateException("AES encryption failed", e);
                 }

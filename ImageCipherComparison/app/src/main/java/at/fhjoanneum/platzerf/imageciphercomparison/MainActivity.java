@@ -197,17 +197,17 @@ public class MainActivity extends AppCompatActivity {
         //lowerText.setText("");
         //showText("Starting run all for " + externalRounds + "x" + internalRounds);
 
-        ((Activity) this).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ((EditText) editText).setText("Starting run all for " + externalRounds + "x" + internalRounds);
-            }
-        });
+        showText("Starting run all for " + externalRounds + "x" + internalRounds);
 
-        showText("Started with Run All");
+        if(types == 1)
+            showText("Started with Encrypt All");
+        else if(types == 2)
+            showText("Started with Decrypt All");
+        else
+            showText("Started with Run All");
 
         new LongAsyncRunner(getSelectedCiphers(), getSelectedImages())
-                .doInBackground(externalRounds, internalRounds, types); // run both enc/dec
+                .execute(externalRounds, internalRounds, types); // run both enc/dec
     }
 
     private List<String> getSelectedImages(){
@@ -276,6 +276,8 @@ public class MainActivity extends AppCompatActivity {
             ImageConverter conv = new ImageConverter();
 
             CsvLogger.AddLine("-", "-", "-", 0, "running for " + externalRounds + " ext rounds and " + internalRounds + " internal rounds");
+
+            long totalStart = System.nanoTime();
 
             for(;type < typesToRun; type++) {
                 // log starting type
@@ -354,7 +356,9 @@ public class MainActivity extends AppCompatActivity {
                 // flush logs
             }
 
-            publishProgress("done with LongAsyncTask");
+
+
+            publishProgress("done with LongAsyncTask , took " + (System.nanoTime()-totalStart)/1000000 + " ms");
             CsvLogger.FlushLog();
 
             return "";
