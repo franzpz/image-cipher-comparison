@@ -1,0 +1,13 @@
+timestamp;cipher;mode;file;rounds;message;
+2017-06-27-12.16.59.147;-;-;-;0;running for 1 ext rounds and 1 internal rounds;
+2017-06-27-12.16.59.148;-;encrypt;-;0;start for images;
+2017-06-27-12.16.59.706;-;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done loading image;
+2017-06-27-12.17.29.714;AES C;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting external rounds;
+2017-06-27-12.17.29.716;AES C;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting round;
+2017-06-27-12.18.11.151;AES C;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;1423;
+2017-06-27-12.18.11.154;AES C;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;41423;
+2017-06-27-12.18.11.233;AES C;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done with cipher;
+2017-06-27-12.18.41.244;AES Java;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting external rounds;
+2017-06-27-12.18.41.255;AES Java;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting round;
+2017-06-27-12.19.21.648;AES Java;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;389;
+2017-06-27-12.19.21.649;AES Java;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;40390;

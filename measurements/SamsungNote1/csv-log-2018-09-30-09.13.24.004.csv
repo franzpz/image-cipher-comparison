@@ -1,0 +1,56 @@
+timestamp;cipher;mode;file;rounds;message
+2018-09-30-09.18.05.514;-;-;-;0;running for 3 ext rounds and 5 internal rounds
+2018-09-30-09.18.05.515;-;encrypt;-;0;start for images
+2018-09-30-09.18.06.036;-;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done loading image
+2018-09-30-09.18.36.050;Image Cipher 2;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting external rounds
+2018-09-30-09.18.36.053;Image Cipher 2;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting round
+2018-09-30-09.19.41.636;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;7303
+2018-09-30-09.19.41.638;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;5237
+2018-09-30-09.19.41.640;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;4637
+2018-09-30-09.19.41.643;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;3;4359
+2018-09-30-09.19.41.645;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;4;4041
+2018-09-30-09.19.41.648;Image Cipher 2;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;65580
+2018-09-30-09.19.41.671;Image Cipher 2;encrypt;/sdcard/Download/testimages/512x512Lenna.png;1;starting round
+2018-09-30-09.20.45.008;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;6721
+2018-09-30-09.20.45.012;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;4119
+2018-09-30-09.20.45.014;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;4107
+2018-09-30-09.20.45.016;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;3;4111
+2018-09-30-09.20.45.019;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;4;4250
+2018-09-30-09.20.45.022;Image Cipher 2;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;63307
+2018-09-30-09.20.45.100;Image Cipher 2;encrypt;/sdcard/Download/testimages/512x512Lenna.png;2;starting round
+2018-09-30-09.21.48.872;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;7266
+2018-09-30-09.21.48.874;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;4141
+2018-09-30-09.21.48.876;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;4060
+2018-09-30-09.21.48.879;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;3;4324
+2018-09-30-09.21.48.882;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;4;3976
+2018-09-30-09.21.48.884;Image Cipher 2;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;63767
+2018-09-30-09.21.48.908;Image Cipher 2;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done with cipher
+2018-09-30-09.21.48.911;-;encrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done with image
+2018-09-30-09.21.48.915;-;encrypt;-;0;done with mode
+2018-09-30-09.21.49.060;-;decrypt;-;0;start for images
+2018-09-30-09.21.49.318;-;decrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done loading image
+2018-09-30-09.22.19.325;Image Cipher 2;decrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting external rounds
+2018-09-30-09.22.19.329;Image Cipher 2;decrypt;/sdcard/Download/testimages/512x512Lenna.png;0;starting round
+2018-09-30-09.23.23.991;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;7641
+2018-09-30-09.23.23.994;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;4151
+2018-09-30-09.23.23.996;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;4364
+2018-09-30-09.23.23.998;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;3;4086
+2018-09-30-09.23.24.002;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;4;4417
+2018-09-30-09.23.24.004;Image Cipher 2;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;64659
+2018-09-30-09.23.24.064;Image Cipher 2;decrypt;/sdcard/Download/testimages/512x512Lenna.png;1;starting round
+2018-09-30-09.24.28.594;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;6719
+2018-09-30-09.24.28.619;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;4104
+2018-09-30-09.24.28.623;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;3972
+2018-09-30-09.24.28.645;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;3;5125
+2018-09-30-09.24.28.647;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;4;4607
+2018-09-30-09.24.28.663;Image Cipher 2;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;64527
+2018-09-30-09.24.28.688;Image Cipher 2;decrypt;/sdcard/Download/testimages/512x512Lenna.png;2;starting round
+2018-09-30-09.25.31.451;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;0;6750
+2018-09-30-09.25.31.461;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;1;3972
+2018-09-30-09.25.31.473;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;4097
+2018-09-30-09.25.31.476;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;3;3972
+2018-09-30-09.25.31.479;Image Cipher 2;times for inner round in ms;/sdcard/Download/testimages/512x512Lenna.png;4;3970
+2018-09-30-09.25.31.481;Image Cipher 2;times for ext round in ms;/sdcard/Download/testimages/512x512Lenna.png;2;62761
+2018-09-30-09.25.31.500;Image Cipher 2;decrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done with cipher
+2018-09-30-09.25.31.502;-;decrypt;/sdcard/Download/testimages/512x512Lenna.png;0;done with image
+2018-09-30-09.25.31.505;-;decrypt;-;0;done with mode

@@ -112,7 +112,7 @@ public class AesJavaCipher implements ImageCipher {
 
         try {
 
-            SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            //SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
 
             for (int r = 0; r < rounds; r++) {
 
@@ -136,7 +136,7 @@ public class AesJavaCipher implements ImageCipher {
                 measurements[r] = (System.nanoTime() - start)/1000000;
             }
 
-            SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            //SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
         }
         catch(Exception ex){
             throw new RuntimeException(ex);
@@ -153,7 +153,7 @@ public class AesJavaCipher implements ImageCipher {
 
         try {
 
-            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            //Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
 
             for (int r = 0; r < rounds; r++) {
 
@@ -177,7 +177,7 @@ public class AesJavaCipher implements ImageCipher {
                 measurements[r] = System.currentTimeMillis() - start;
             }
 
-            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            //Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
         }
         catch(Exception ex){
             throw new RuntimeException(ex);

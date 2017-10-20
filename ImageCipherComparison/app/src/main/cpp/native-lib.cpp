@@ -117,7 +117,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_runImageBytesCiph
     jlong measurements[rounds];
 
     long tmp;
-    sleep((unsigned int)sleepInSeconds);
+    //sleep((unsigned int)sleepInSeconds);
 
     for(int r = 0; r < (int)rounds; r++) {
 
@@ -162,7 +162,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2_runImageBytesCiph
         measurements[r] = (jlong) (currentTimeInMs() - tmp);
     }
 
-    sleep((unsigned int)sleepInSeconds);
+    //sleep((unsigned int)sleepInSeconds);
 
     jlongArray out;
     out = env->NewLongArray(rounds);
@@ -184,7 +184,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_runImageBytesCiph
     jlong measurements[rounds];
 
     long tmp;
-    sleep((unsigned int)sleepInSeconds);
+   // sleep((unsigned int)sleepInSeconds);
 
     for(int r = 0; r < rounds; r++) {
 
@@ -211,7 +211,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_runImageBytesCiph
         measurements[r] = (jlong) (currentTimeInMs() - tmp);
     }
 
-    sleep((unsigned int)sleepInSeconds);
+    //sleep((unsigned int)sleepInSeconds);
 
     /*jint *convertedImageBytes = (jint *) malloc(sizeof(jint *) * len);
 
@@ -270,7 +270,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes
 
     long tmp;
     int sleepTimeInSec = 1;
-    sleep(sleepTimeInSec);
+    //sleep(sleepTimeInSec);
 
     for(int r = 0; r < rounds; r++) {
 
@@ -294,7 +294,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_encryptImageBytes
         measurements[r] = currentTimeInMs() - tmp;
     }
 
-    sleep(sleepTimeInSec);
+    //sleep(sleepTimeInSec);
 
     /*jint *convertedImageBytes = (jint *) malloc(sizeof(jint *) * len);
 
