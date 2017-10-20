@@ -35,6 +35,9 @@ public class SimpleFileLogger implements Writer {
 
     public void Write(String text){
         logCache.add(getCurrentTimeStamp() + " - " + text + "\n");
+
+        if(logCache.size() > 3)
+            Flush();
     }
 
     public void Flush(){

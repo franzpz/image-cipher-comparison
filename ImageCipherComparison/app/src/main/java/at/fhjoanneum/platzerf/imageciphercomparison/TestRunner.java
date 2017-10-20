@@ -27,8 +27,7 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
 
         ImageConverter conv = new ImageConverter();
 
-        output.Write("running for " + config.NumberOfExtRoundsToRun + " ext rounds and " + config.NumberOfIntRoundsToRun + " internal rounds");
-        output.Flush();
+        publishProgress("running for " + config.NumberOfExtRoundsToRun + " ext rounds and " + config.NumberOfIntRoundsToRun + " internal rounds");
 
         long totalStart = System.nanoTime();
 
@@ -36,7 +35,7 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
 
             Wait(config.PauseBetweenFunctionsInSeconds);
 
-            output.Write("doing " + f.toString());
+            publishProgress("doing " + f.toString());
 
             // load Image = async
             String filename = config.Image;
@@ -54,19 +53,19 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
                 newFilename = filename + ".encrypted.png";
             }
 
-            output.Write("done loading image: " + filename);
+            publishProgress("done loading image: " + filename);
 
             for (ImageCipher curr : config.Ciphers) {
 
                 Wait(config.PauseBetweenCiphersInSeconds);
 
-                output.Write("working on cipher: " + curr.getName());
+                publishProgress("working on cipher: " + curr.getName());
 
                 long[] measurements = new long[0];
 
                 for (int extRound = 0; extRound < config.NumberOfExtRoundsToRun; extRound++) {
 
-                    output.Write(curr.getName() + " - " + f + " - filename: " + filename + " - starting round: " + extRound);
+                    publishProgress(curr.getName() + " - " + f + " - filename: " + filename + " - starting round: " + extRound);
 
                     long startTime = System.nanoTime();
 
@@ -81,25 +80,20 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
                     long endTime = System.nanoTime();
 
                     for(int r = 0; r < measurements.length; r++){
-                        output.Write(curr.getName() + " - inner round " + r + " took " + measurements[r] + "");
+                        publishProgress(curr.getName() + " - inner round " + r + " took " + measurements[r] + "");
                     }
 
                     float timeTaken = (endTime-startTime)/1000000;
-                    output.Write(curr.getName() + " - ext round " + extRound + " took " + timeTaken + "");
-
-                    output.Flush();
+                    publishProgress(curr.getName() + " - ext round " + extRound + " took " + timeTaken + "");
                 }
 
-                output.Write(curr.getName() + " - done with cipher");
-                output.Flush();
+                publishProgress(curr.getName() + " - done with cipher");
             }
 
-            output.Write("done with " + f);
-            output.Flush();
+            publishProgress("done with " + f);
         }
 
-        output.Write("done with LongAsyncTask , took " + (System.nanoTime()-totalStart)/1000000 + " ms");
-        output.Flush();
+        publishProgress("done with LongAsyncTask , took " + (System.nanoTime()-totalStart)/1000000 + " ms");
 
         return "";
     }
