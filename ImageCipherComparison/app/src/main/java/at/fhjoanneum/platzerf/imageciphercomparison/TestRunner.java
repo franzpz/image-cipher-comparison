@@ -67,9 +67,9 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
 
                     publishProgress(curr.getName() + " - " + f + " - filename: " + filename + " - starting round: " + extRound);
 
-                    long startTime = System.nanoTime();
-
                     Wait(config.PauseBetweenExtRounds);
+
+                    long startTime = System.nanoTime();
 
                     if (f == Function.Encrypt)
                         measurements = curr.encryptLong(newImage.ImageBytes, sumOfBytes, config.NumberOfIntRoundsToRun);
@@ -80,11 +80,11 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
                     long endTime = System.nanoTime();
 
                     for(int r = 0; r < measurements.length; r++){
-                        publishProgress(curr.getName() + " - inner round " + r + " took " + measurements[r] + "");
+                        publishProgress(curr.getName() + " - inner round " + r + " took " + measurements[r] + " ms");
                     }
 
                     float timeTaken = (endTime-startTime)/1000000;
-                    publishProgress(curr.getName() + " - ext round " + extRound + " took " + timeTaken + "");
+                    publishProgress(curr.getName() + " - ext round " + extRound + " took " + timeTaken + " ms");
                 }
 
                 publishProgress(curr.getName() + " - done with cipher");
@@ -99,11 +99,9 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
     }
 
     public void Wait(int seconds){
-        output.Write("waiting for " + seconds);
-        output.Flush();
+        publishProgress("waiting for " + seconds + " secs");
         SystemClock.sleep((int)(config.PauseBetweenCiphersInSeconds*1000));
-        output.Write("done waiting");
-        output.Flush();
+        publishProgress("done waiting");
     }
 
     @Override

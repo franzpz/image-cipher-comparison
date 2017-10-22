@@ -1,6 +1,8 @@
 package at.fhjoanneum.platzerf.imageciphercomparison;
 
 import android.content.Context;
+import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,8 +27,24 @@ public class SimpleFileLogger implements Writer {
         this.context = context;
 
         try {
-            File gpxfile = new File(context.getFilesDir(), "imagecipher-" + getCurrentTimeStamp() + ".log");
+            File[] extFiles = ContextCompat.getExternalFilesDirs(context, null);
+
+            File extDir = null;
+            int i = 0;
+            while(!(extDir = extFiles[i++]).exists());
+
+            if(!extDir.exists())
+                extDir.mkdirs();
+
+            File gpxfile = new File(extDir.getAbsolutePath(), "imagecipher-" + getCurrentTimeStamp() + ".log");
             currentFile = gpxfile.getAbsolutePath();
+            FileOutputStream out = new FileOutputStream(currentFile);
+            OutputStreamWriter writer = new OutputStreamWriter(out);
+            writer.write("Init File\n");
+            writer.flush();
+            writer.close();
+            out.flush();
+            out.close();
         } catch (Exception e) {
             Log.e("Ciphers", "logging failed", e);
             Toast.makeText(context, "failed logger: " + e.getMessage(), Toast.LENGTH_LONG).show();

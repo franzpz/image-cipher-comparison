@@ -100,11 +100,11 @@ public class MainActivity extends AppCompatActivity {
         ImageCipher twoJava = new ImageCipher2Java();
         ImageCipher aesC = new AesCCipher();
         ciphers.put(one.getName(), one);
-        ciphers.put(oneGmp.getName(), oneGmp);
+        //ciphers.put(oneGmp.getName(), oneGmp);
         ciphers.put(two.getName(), two);
-        ciphers.put(twoGmp.getName(), twoGmp);
+        //ciphers.put(twoGmp.getName(), twoGmp);
         ciphers.put(aesJava.getName(), aesJava);
-        ciphers.put(twoJava.getName(), twoJava);
+        //ciphers.put(twoJava.getName(), twoJava);
         ciphers.put(aesC.getName(), aesC);
         selectedCipher = one;
 
@@ -185,9 +185,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void run(TestConfig config){
         config.Ciphers.addAll(getSelectedCiphers());
-        config.PauseBetweenFunctionsInSeconds = (int)1.38*20;
-        config.PauseBetweenCiphersInSeconds = (int)1.38*15;
-        config.PauseBetweenExtRounds = (int)1.38*10;
+        config.PauseBetweenFunctionsInSeconds = 30;
+        config.PauseBetweenCiphersInSeconds = 25;
+        config.PauseBetweenExtRounds = 20;
 
         config.NumberOfIntRoundsToRun = internalroundspicker.getValue();
         config.NumberOfExtRoundsToRun = numberPicker.getValue();
