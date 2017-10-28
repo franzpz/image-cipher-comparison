@@ -108,8 +108,8 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             ${CPATH}tinyaes/aes.h
-             ${CPATH}tinyaes/aes.c
+             ${CPATH}tinyaes2/aes.h
+             ${CPATH}tinyaes2/aes.c
              )
 
 # Searches for a specified prebuilt library and stores the path as a

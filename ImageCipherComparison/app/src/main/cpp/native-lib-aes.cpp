@@ -9,7 +9,7 @@
 
 
 extern "C" {
-    #include "tinyaes/aes.h"
+    #include "tinyaes2/aes.h"
 }
 
 //CRYPT CONFIG
@@ -93,32 +93,16 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_AesCCipher_runAesCLong(JNIEnv 
                                      0x14, 0xdf,
                                      0xf4};
 
-        BYTE *padded_buffer_in = (BYTE *) malloc(sizeof(BYTE) * numberOfBytes);
-        BYTE *padded_buffer_out = (BYTE *) malloc(sizeof(BYTE) * numberOfBytes);
+        uint8_t *padded_buffer_in = (uint8_t *) malloc(sizeof(uint8_t) * numberOfBytes);
+        uint8_t *padded_buffer_out = (uint8_t *) malloc(sizeof(uint8_t) * numberOfBytes);
 
-        //set key & iv
-        unsigned int key_schedule[AES_BLOCK_SIZE * 4] = {0};
-        aes_key_setup(AES_KEY, key_schedule, AES_KEY_SIZE);
+        convertToUnsignedCharArray(padded_buffer_in, imageBytes, numberOfBytes);
 
-        int currentBlock = 0;
-        int proccessedBytes = 0;
-        long byteLength = AES_BLOCK_SIZE;
-        while (proccessedBytes < numberOfBytes) {
-            if(numberOfBytes - proccessedBytes < AES_BLOCK_SIZE)
-                byteLength = numberOfBytes - proccessedBytes;
-
-            if(mode == 1) {
-                aes_encrypt_ctr(&padded_buffer_in[currentBlock * AES_BLOCK_SIZE], (int)byteLength,
-                            &padded_buffer_out[currentBlock * AES_BLOCK_SIZE], key_schedule,
-                            AES_KEY_SIZE, AES_IV);
-            }
-            else if(mode == 2) {
-                aes_decrypt_ctr(&padded_buffer_in[currentBlock * AES_BLOCK_SIZE], (int)byteLength,
-                            &padded_buffer_out[currentBlock * AES_BLOCK_SIZE], key_schedule,
-                            AES_KEY_SIZE, AES_IV);
-            }
-            proccessedBytes += AES_BLOCK_SIZE;
-            currentBlock++;
+        if(mode == 1) {
+            AES_CBC_encrypt_buffer(padded_buffer_out, padded_buffer_in, numberOfBytes, AES_KEY, AES_IV);
+        }
+        else if(mode == 2) {
+            AES_CBC_decrypt_buffer(padded_buffer_out, padded_buffer_in, numberOfBytes, AES_KEY, AES_IV);
         }
 
         //log_info(TAG, " converted bytes ");
