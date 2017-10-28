@@ -1,5 +1,7 @@
 #include <jni.h>
 #include <string>
+#include <time.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <android/log.h>
@@ -15,6 +17,17 @@ extern "C" {
 #define log_info_f(tag,fmt,...) __android_log_print(ANDROID_LOG_INFO,tag,fmt,__VA_ARGS__)
 #define log_info(tag,msg) __android_log_print(ANDROID_LOG_INFO,tag,msg)
 #define log_warn(tag,fmt,...) __android_log_print(ANDROID_LOG_ERROR,tag,fmt,__VA_ARGS__)
+
+#define NANOS_IN_SECOND 1000000000
+
+static long currentTimeInMs() {
+
+    struct timespec res;
+    clock_gettime(CLOCK_MONOTONIC, &res);
+
+    return lround(res.tv_nsec / 1.0e6) + res.tv_sec * 1000;
+}
+
 
 #define TAG "Ciphers C"
 extern "C"
@@ -47,7 +60,7 @@ void useImageCipher1(int mode, unsigned char imageBytes[], long length, long sum
     mpf_set_d(diffuSetups[1].x, 0.360000000000001);
     mpf_set_d(diffuSetups[1].y, 0.360000000000002);
 
-    runAlgorithm(mode, imageBytes, length, sumOfBytes, permSetups, diffuSetups,  rounds);
+    runAlgorithm(mode, imageBytes, length, sumOfBytes, permSetups, diffuSetups,  1);
 
     free(permSetups);
     free(diffuSetups);
@@ -70,29 +83,60 @@ void convertToJintArray(unsigned char *convImageBytes, jint *imageBytes, long le
 }
 
 extern "C"
-JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1Gmp_encryptImageBytesCipher1Rounds(JNIEnv *env,
-                                                                                           jobject instance,
-                                                                                           jintArray originalImageBytes_,
-                                                                                           jlong sumOfImageBytes, jint rounds) {
+JNIEXPORT jlongArray JNICALL
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1Gmp_runImageBytesCipher1GmpCipherResult(
+        JNIEnv *env, jobject instance, jintArray originalImageBytes_, jlong sumOfImageBytes,
+        jint rounds, jint sleepInSeconds, jint mode) {
+
     jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
     long len = env->GetArrayLength(originalImageBytes_);
 
-    unsigned char *imageBytes = (unsigned char*)malloc(sizeof(unsigned char)*len);
-    long sumOfBytes = (long)sumOfImageBytes;
+    int algMode = mode == 1 ? ENC_MODE : DEC_MODE;
 
-    convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
-    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
+    jlong measurements[rounds];
 
-    useImageCipher1(DEC_MODE, imageBytes, len, sumOfBytes, (int) rounds);
+    long tmp;
+    //sleep((unsigned int)sleepInSeconds);
 
-    jint* convertedImageBytes = (jint*)malloc(sizeof(jint*)*len);
-    convertToJintArray(imageBytes, convertedImageBytes, len);
-    free(imageBytes);
+    for(int r = 0; r < rounds; r++) {
+
+        tmp = currentTimeInMs();
+
+        unsigned char *imageBytes = (unsigned char *) malloc(sizeof(unsigned char) * len);
+        long sumOfBytes = (long) sumOfImageBytes;
+
+        convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
+
+        if(algMode == ENC_MODE) {
+            sumOfBytes = 0;
+            for (int i = 0; i < len; i++)
+                sumOfBytes += (long) imageBytes[i];
+        }
+
+        useImageCipher1(algMode, imageBytes, len, sumOfBytes, 1);
+
+        jint *convertedImageBytes = (jint*)malloc(sizeof(jint)*len);
+        convertToJintArray(imageBytes, convertedImageBytes, len);
+        free(imageBytes);
+        free(convertedImageBytes);
+
+        measurements[r] = (jlong) (currentTimeInMs() - tmp);
+    }
+
+    //sleep((unsigned int)sleepInSeconds);
+
+    /*jint *convertedImageBytes = (jint *) malloc(sizeof(jint *) * len);
 
     env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
     env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
-    return  originalImageBytes_;
+     */
+
+    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
+
+    jlongArray out;
+    out = env->NewLongArray(rounds);
+    env->SetLongArrayRegion(out, 0, rounds, measurements);
+    return out;
 }
 
 extern "C"

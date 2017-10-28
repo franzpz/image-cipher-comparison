@@ -75,6 +75,18 @@
         android:layout_height="wrap_content"
         android:text="Image Cipher 2" />
 
+    <CheckBox
+        android:id="@+id/imageCipher1gmp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Image Cipher 1 GMP" />
+
+    <CheckBox
+        android:id="@+id/imageCipher2gmp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Image Cipher 2 GMP" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
