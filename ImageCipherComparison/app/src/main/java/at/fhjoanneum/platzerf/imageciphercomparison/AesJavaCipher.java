@@ -57,7 +57,6 @@ public class AesJavaCipher implements ImageCipher {
         return "AES Java";
     }
 
-    @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes) {
         cipherEnc = init(Cipher.ENCRYPT_MODE);
 
@@ -78,7 +77,6 @@ public class AesJavaCipher implements ImageCipher {
         return imageBytes;
     }
 
-    @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes) {
         cipherDec = init(Cipher.DECRYPT_MODE);
 
@@ -100,11 +98,6 @@ public class AesJavaCipher implements ImageCipher {
     }
 
     @Override
-    public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
-    }
-
-    @Override
     public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
 
         long[] measurements = new long[rounds];
@@ -112,7 +105,7 @@ public class AesJavaCipher implements ImageCipher {
 
         try {
 
-            //SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
 
             for (int r = 0; r < rounds; r++) {
 
@@ -136,7 +129,7 @@ public class AesJavaCipher implements ImageCipher {
                 measurements[r] = (System.nanoTime() - start)/1000000;
             }
 
-            //SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            SystemClock.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
         }
         catch(Exception ex){
             throw new RuntimeException(ex);
@@ -153,7 +146,7 @@ public class AesJavaCipher implements ImageCipher {
 
         try {
 
-            //Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
 
             for (int r = 0; r < rounds; r++) {
 
@@ -177,7 +170,7 @@ public class AesJavaCipher implements ImageCipher {
                 measurements[r] = System.currentTimeMillis() - start;
             }
 
-            //Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
         }
         catch(Exception ex){
             throw new RuntimeException(ex);
@@ -185,10 +178,5 @@ public class AesJavaCipher implements ImageCipher {
 
         return measurements;
 
-    }
-
-    @Override
-    public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
     }
 }

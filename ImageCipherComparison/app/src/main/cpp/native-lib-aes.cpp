@@ -75,7 +75,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_AesCCipher_runAesCLong(JNIEnv 
     jlong measurements[rounds];
 
     long tmp;
-    //sleep(sleepInSeconds);
+    sleep(sleepInSeconds);
 
     for(int r = 0; r < rounds; r++) {
 
@@ -117,7 +117,7 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_AesCCipher_runAesCLong(JNIEnv 
         measurements[r] = (jlong) (currentTimeInMs() - tmp);
     }
 
-    //sleep(sleepInSeconds);
+    sleep(sleepInSeconds);
 
     //env->SetIntArrayRegion(originalImageBytes_, 0, numberOfBytes, originalImageBytes);
     env->ReleaseIntArrayElements(imageBytes_, imageBytes, 0);
@@ -127,29 +127,3 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_AesCCipher_runAesCLong(JNIEnv 
     env->SetLongArrayRegion(out, 0, rounds, measurements);
     return out;
 }
-/*
-extern "C"
-JNIEXPORT jintArray JNICALL
-Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher1_decryptImageBytesCipher1(JNIEnv *env,
-                                                                                 jobject instance,
-                                                                                 jintArray originalImageBytes_,
-                                                                                 jlong sumOfImageBytes) {
-    jint *originalImageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
-    long len = env->GetArrayLength(originalImageBytes_);
-
-    unsigned char *imageBytes = (unsigned char*)malloc(sizeof(unsigned char)*len);
-    long sumOfBytes = (long)sumOfImageBytes;
-
-    convertToUnsignedCharArray(imageBytes, originalImageBytes, len);
-    env->ReleaseIntArrayElements(originalImageBytes_, originalImageBytes, 0);
-
-    useImageCipher1(DEC_MODE, imageBytes, len, sumOfBytes);
-
-    jint* convertedImageBytes = (jint*)malloc(sizeof(jint*)*len);
-    convertToJintArray(imageBytes, convertedImageBytes, len);
-    free(imageBytes);
-
-    env->SetIntArrayRegion(originalImageBytes_, 0, len, convertedImageBytes);
-    env->ReleaseIntArrayElements(originalImageBytes_, convertedImageBytes, 0);
-    return  originalImageBytes_;
-}*/

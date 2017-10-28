@@ -222,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onTestAes(View v) {
         String result = CipherProviderTests.policyTests();
-        CsvLogger.AddLine("test cipher aes 256bit", "encrypt", "Provider Test", 1, result);
         prependText(result);
     }
 

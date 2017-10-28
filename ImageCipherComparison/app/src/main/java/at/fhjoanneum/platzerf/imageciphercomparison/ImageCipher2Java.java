@@ -30,7 +30,6 @@ public class ImageCipher2Java implements ImageCipher {
         return "Image Cipher 2 Java";
     }
 
-    @Override
     public int[] encrypt(int[] imageBytes, long sumOfBytes) {
         params = createParams(key);
         int i = 0;
@@ -41,7 +40,6 @@ public class ImageCipher2Java implements ImageCipher {
         return imageBytes;
     }
 
-    @Override
     public int[] decrypt(int[] imageBytes, long sumOfBytes) {
 
         params = createParams(key);
@@ -54,11 +52,6 @@ public class ImageCipher2Java implements ImageCipher {
     }
 
     @Override
-    public int[] encrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
-    }
-
-    @Override
     public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
         return new long[0];
     }
@@ -68,10 +61,6 @@ public class ImageCipher2Java implements ImageCipher {
         return new long[0];
     }
 
-    @Override
-    public int[] decrypt(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new int[0];
-    }
 
     public class AlgoParams {
         public double X = 0.0;

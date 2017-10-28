@@ -67,9 +67,11 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
 
                     publishProgress(curr.getName() + " - " + f + " - filename: " + filename + " - starting round: " + extRound);
 
-                    Wait(config.PauseBetweenExtRounds);
+                    //Wait(config.PauseBetweenExtRounds);
 
                     long startTime = System.nanoTime();
+
+                    publishProgress("Entering cipher code, going to wait for " + Constants.SleepTimeBetweenRoundsInSeconds + " sec before execution");
 
                     if (f == Function.Encrypt)
                         measurements = curr.encryptLong(newImage.ImageBytes, sumOfBytes, config.NumberOfIntRoundsToRun);
@@ -99,9 +101,11 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
     }
 
     public void Wait(int seconds){
+
         publishProgress("waiting for " + seconds + " secs");
         SystemClock.sleep((int)(config.PauseBetweenCiphersInSeconds*1000));
         publishProgress("done waiting");
+
     }
 
     @Override

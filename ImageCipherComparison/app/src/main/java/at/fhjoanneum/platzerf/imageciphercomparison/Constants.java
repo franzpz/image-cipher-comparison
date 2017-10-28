@@ -5,5 +5,5 @@ package at.fhjoanneum.platzerf.imageciphercomparison;
  */
 
 public class Constants {
-    public static final int  SleepTimeBetweenRoundsInSeconds = 20;
+    public static final int  SleepTimeBetweenRoundsInSeconds = 10;
 }
