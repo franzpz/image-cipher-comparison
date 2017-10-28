@@ -33,12 +33,13 @@ public class ImageCipher2Gmp implements ImageCipher {
 
     @Override
     public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new long[0];
+
+        return runImageBytesCipher2GmpLong(imageBytes, rounds, Constants.SleepTimeBetweenRoundsInSeconds, 1);
     }
 
     @Override
     public long[] decryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
-        return new long[0];
+        return runImageBytesCipher2GmpLong(imageBytes, rounds, Constants.SleepTimeBetweenRoundsInSeconds, 2);
     }
 
     @Override
@@ -54,4 +55,5 @@ public class ImageCipher2Gmp implements ImageCipher {
     public native int[] decryptImageBytesCipher2(int[] originalImageBytes);
     public native int[] encryptImageBytesCipher2Rounds(int[] originalImageBytes, int rounds);
     public native int[] decryptImageBytesCipher2Rounds(int[] originalImageBytes, int rounds);
+    public native long[] runImageBytesCipher2GmpLong(int[] originalImageBytes, int rounds, int sleepInSeconds, int mode); //1 = enc, 2 = dec
 }

@@ -387,3 +387,70 @@ Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2Gmp_decryptImageBy
     env->ReleaseIntArrayElements(imageBytes_, imageBytes, 0);
     return imageBytes_;
 }
+
+extern "C"
+JNIEXPORT jlongArray JNICALL
+Java_at_fhjoanneum_platzerf_imageciphercomparison_ImageCipher2Gmp_runImageBytesCipher2GmpLong(JNIEnv *env,
+                                                                                           jobject instance,
+                                                                                           jintArray originalImageBytes_,
+                                                                                           jint rounds,
+                                                                                           jint sleepInSeconds,
+                                                                                           jint mode) {
+    jint *imageBytes = env->GetIntArrayElements(originalImageBytes_, NULL);
+    int len = env->GetArrayLength(originalImageBytes_);
+
+    jlong measurements[rounds];
+
+    long tmp;
+    //sleep((unsigned int)sleepInSeconds);
+
+    for(int r = 0; r < (int)rounds; r++) {
+
+        tmp = currentTimeInMs();
+
+        char *key = (char *) "1234578901234567890123456789012";
+        unsigned char iv[] = {
+                34, 45, 56, 78, 90, 12, 34, 23, 56, 78, 9, 3, 5, 23, 87,
+                3, 4, 5, 1, 9, 8, 34, 89, 34, 22, 93, 75, 76, 23, 16, 39, 53
+        };
+
+        int block, blockPos, bytesProcessed;
+
+        unsigned char buffer[BUFFER_SIZE];
+
+        AlgorithmParameter params = generateInitialContitions((unsigned char*)key);
+
+        block = 0;
+        blockPos = 0;
+        bytesProcessed = 0;
+        while (bytesProcessed < len) {
+
+            blockPos = 0;
+            while (blockPos < BUFFER_SIZE && bytesProcessed < len) {
+                buffer[blockPos] = (unsigned char) imageBytes[bytesProcessed];
+                blockPos++;
+                bytesProcessed++;
+            }
+
+            if(mode == 1)
+                encrypt(&params, buffer, blockPos, (unsigned char *) key, iv);
+            else if(mode == 2)
+                decrypt(&params, buffer, blockPos, (unsigned char *) key, iv);
+
+            for (int i = 0; i < blockPos; i++) {
+                imageBytes[block * BUFFER_SIZE + i] = buffer[i];
+            }
+
+            block++;
+        }
+
+        measurements[r] = (jlong) (currentTimeInMs() - tmp);
+    }
+
+    //sleep((unsigned int)sleepInSeconds);
+
+    jlongArray out;
+    out = env->NewLongArray(rounds);
+    env->SetLongArrayRegion(out, 0, rounds, measurements);
+    return out;
+}
