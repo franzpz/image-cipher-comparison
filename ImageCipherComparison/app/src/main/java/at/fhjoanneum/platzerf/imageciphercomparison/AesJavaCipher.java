@@ -97,6 +97,30 @@ public class AesJavaCipher implements ImageCipher {
         return imageBytes;
     }
 
+    public void WriteEncryptedToFileSystem(String path){
+        ImageConverter conv = new ImageConverter();
+        String targetPath = path.replace(".png", ".aesjavaencrypted.png");
+
+        ConvertedImage orig = conv.ConvertFromArgbImage(path);
+
+        orig.ImageBytes = encrypt(orig.ImageBytes, orig.SumOfBytes);
+
+        conv.saveArgbImage(orig, targetPath);
+    }
+
+    public void WriteDecryptedToFileSystem(String path){
+        ImageConverter conv = new ImageConverter();
+        String targetPath = path.replace("aesjavaencrypted.png", ".aesjavadecrypted.png");
+
+        ConvertedImage orig = conv.ConvertFromArgbImage(path);
+
+        orig.ImageBytes = decrypt(orig.ImageBytes, orig.SumOfBytes);
+
+        conv.saveArgbImage(orig, targetPath);
+    }
+
+    int[] imageBytesResult;
+
     @Override
     public long[] encryptLong(int[] imageBytes, long sumOfBytes, int rounds) {
 
@@ -125,6 +149,8 @@ public class AesJavaCipher implements ImageCipher {
 
                 for(int i = 0; i < imageBytes.length; i++)
                     imageBytes[i] = inputBytes[i] < 0 ? ((int)inputBytes[i]) + 256 : inputBytes[i];
+
+                imageBytesResult = imageBytes;
 
                 measurements[r] = (System.nanoTime() - start)/1000000;
             }

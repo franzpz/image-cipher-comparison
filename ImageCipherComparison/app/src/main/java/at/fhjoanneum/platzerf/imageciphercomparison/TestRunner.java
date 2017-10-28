@@ -68,10 +68,11 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
                     publishProgress(curr.getName() + " - " + f + " - filename: " + filename + " - starting round: " + extRound);
 
                     //Wait(config.PauseBetweenExtRounds);
+                    Constants.SleepTimeBetweenRoundsInSeconds = config.PauseBetweenExtRounds;
 
                     long startTime = System.nanoTime();
 
-                    publishProgress("Entering cipher code, going to wait for " + Constants.SleepTimeBetweenRoundsInSeconds + " sec before execution");
+                    publishProgress("Entering cipher code, going to wait for " + config.PauseBetweenExtRounds + " sec before execution");
 
                     if (f == Function.Encrypt)
                         measurements = curr.encryptLong(newImage.ImageBytes, sumOfBytes, config.NumberOfIntRoundsToRun);

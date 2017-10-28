@@ -142,22 +142,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onRunEnc(View v) {
+
+        /*String path = getSelectedImages().get(0);
+        AesJavaCipher c = new AesJavaCipher();
+        c.WriteEncryptedToFileSystem(path);
+        return;*/
+
         TestConfig config = new TestConfig();
         config.Functions.add(Function.Encrypt);
         run(config);
+
     }
 
     public void onRunDec(View v) {
+        /*String path = getSelectedImages().get(0);
+        AesJavaCipher c = new AesJavaCipher();
+        c.WriteDecryptedToFileSystem(path);
+        return;*/
+
+
         TestConfig config = new TestConfig();
         config.Functions.add(Function.Decrypt);
         run(config);
+
     }
 
     public void run(TestConfig config){
         config.Ciphers.addAll(getSelectedCiphers());
-       /* config.PauseBetweenFunctionsInSeconds = 30;
-        config.PauseBetweenCiphersInSeconds = 25;
-        config.PauseBetweenExtRounds = 20;*/
+        config.PauseBetweenFunctionsInSeconds = 20;
+        config.PauseBetweenCiphersInSeconds = 15;
+        config.PauseBetweenExtRounds = 12;
 
         config.NumberOfIntRoundsToRun = internalroundspicker.getValue();
         config.NumberOfExtRoundsToRun = numberPicker.getValue();
