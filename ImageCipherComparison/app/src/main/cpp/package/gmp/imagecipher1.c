@@ -442,7 +442,7 @@ void createPermutationSequence(int permutationSequence[], mpf_t r, mpf_t x, long
 
     //mpf_t groupedArrays[numberOfGroups][groupArrayLengths];
 
-    mpf_t **groupedArrays = (mpf_t**)malloc(sizeof(mpf_t*)*numberOfGroups*groupArrayLengths);
+    mpf_t **groupedArrays = (mpf_t**)malloc(sizeof(mpf_t)*numberOfGroups*groupArrayLengths);
     int *lastGroupedArrayPosition = (int*)malloc(sizeof(int)*numberOfGroups);
 
     // initialize arrays

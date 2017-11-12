@@ -9,6 +9,7 @@ import java.security.Provider;
 import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Objects;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -26,7 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class CipherProviderTests {
 
     public static String policyTests(){
-        String algorithm = "AES/CBC/NoPadding";
+        String algorithm = "AES/CBC/PKCS5Padding";
         String provider = "BC";
         byte[]           data = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
@@ -128,6 +129,57 @@ public class CipherProviderTests {
         b.append("Tests completed");
 
         return b.toString();
+    }
+
+    public void test(){
+
+        String algorithm = "AES/CBC/PKCS5Padding";
+        String provider = "BC";
+        byte[] data = {
+                0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+
+        StringBuilder b = new StringBuilder();
+
+        SecretKey key256 = new SecretKeySpec(new byte[] {
+                0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+                0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F}, "Blowfish");
+
+        try
+        {
+            Cipher c = Cipher.getInstance(algorithm, provider);
+
+            c.init(Cipher.ENCRYPT_MODE, key256);
+
+            c.doFinal(data);
+
+            b.append("256 bit test: passed");
+        }
+        catch (SecurityException e)
+        {
+            if (e.getMessage().equals("Unsupported keysize or algorithm parameters"))
+            {
+                b.append("256 bit test failed: unrestricted policy files have " +
+                        "not been installed for this runtime.");
+            }
+            else
+            {
+                b.append("256 bit test failed: there are bigger problems than just policy files: ")
+                        .append(e);
+            }
+        }
+        catch (GeneralSecurityException e)
+        {
+            b.append("256 bit test failed: there are bigger problems than just policy files: ")
+                    .append(e);
+        }
+
+        b.append("Tests completed");
+
+
+        b.toString();
     }
 
     /*public static String readProviders(){

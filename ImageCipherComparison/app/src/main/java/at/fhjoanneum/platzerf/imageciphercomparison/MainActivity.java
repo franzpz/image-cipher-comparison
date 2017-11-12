@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -20,8 +21,11 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -229,14 +233,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSleepTest(View v) {
-        showText("Starting wait for 30 rounds with 30 seconds per round");
-        String result = WaitTester.waitFor(30);
-        prependText(result);
+        String filename = "in-app-ps-call-" + new SimpleDateFormat("yyyy-MM-dd.HH.mm.ss").format(new Date()) + ".txt";
+        prependText("Writing current running processes to file: " + filename);
+
+        try{
+            File[] extFiles = ContextCompat.getExternalFilesDirs(this, null);
+
+            File extDir = null;
+            int i = 0;
+            while(!(extDir = extFiles[i++]).exists());
+
+            if(!extDir.exists())
+                extDir.mkdirs();
+
+            String file = new File(extDir.getAbsolutePath(), filename).getAbsolutePath();
+
+
+
+            Process su = Runtime.getRuntime().exec(new String[]{"sh", "ps &> " + file});
+            su.waitFor();
+            prependText("done writing processes to file");
+        } catch (IOException e) {
+            e.printStackTrace();
+            prependText("failed writing processes to file: " +e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onTestAes(View v) {
-        String result = CipherProviderTests.policyTests();
-        prependText(result);
+
+        String image = getSelectedImages().get(0);
+        prependText("Encrypting AES Java file: "+image);
+        AesJavaCipher aes = new AesJavaCipher();
+        aes.WriteEncryptedToFileSystem(image);
+        prependText("Done encrypting AES Java");
+
+        //String result = CipherProviderTests.policyTests();
+        //prependText(result);
     }
 
     public void showText(String text){

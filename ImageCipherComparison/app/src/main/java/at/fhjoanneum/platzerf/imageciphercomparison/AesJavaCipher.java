@@ -2,6 +2,13 @@ package at.fhjoanneum.platzerf.imageciphercomparison;
 
 import android.os.SystemClock;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.BadPaddingException;
@@ -97,15 +104,44 @@ public class AesJavaCipher implements ImageCipher {
         return imageBytes;
     }
 
+    public byte[] encryptRaw(byte[] clear) throws Exception {
+        cipherEnc = init(Cipher.ENCRYPT_MODE);
+        byte[] encrypted = cipherEnc.doFinal(clear);
+        return encrypted;
+    }
+
+    public byte[] decryptRaw(byte[] encrypted) throws Exception {
+        cipherEnc = init(Cipher.DECRYPT_MODE);
+        byte[] decrypted = cipherEnc.doFinal(encrypted);
+        return decrypted;
+    }
+
     public void WriteEncryptedToFileSystem(String path){
-        ImageConverter conv = new ImageConverter();
-        String targetPath = path.replace(".png", ".aesjavaencrypted.png");
 
-        ConvertedImage orig = conv.ConvertFromArgbImage(path);
+        try {
+            byte[] bytes = readFileAsRawBytes(path);
 
-        orig.ImageBytes = encrypt(orig.ImageBytes, orig.SumOfBytes);
+            byte[] encrypted = encryptRaw(bytes);
 
-        conv.saveArgbImage(orig, targetPath);
+            String targetPath = path.replace(".png", ".aesjavaencrypted.png");
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(targetPath));
+            out.write(encrypted);
+            out.close();
+        }
+        catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private byte[] readFileAsRawBytes(String path) throws IOException {
+        File file = new File(path);
+        FileInputStream fis = new FileInputStream(path);
+        byte[] bytes = new byte[(int)file.length()];
+
+        BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+        buf.read(bytes, 0, bytes.length);
+        buf.close();
+        return bytes;
     }
 
     public void WriteDecryptedToFileSystem(String path){
@@ -162,6 +198,52 @@ public class AesJavaCipher implements ImageCipher {
         }
 
         return measurements;
+    }
+
+    public long[] decryptLongFromImage(int[] imageBytes, String file, int rounds){
+
+
+        long[] measurements = new long[rounds];
+        long start;
+
+        try {
+            // do before pause so not counted in measurements
+            byte[] rawInput = readFileAsRawBytes(file);
+
+            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+
+            for (int r = 0; r < rounds; r++) {
+
+                start = System.currentTimeMillis();
+
+                cipherDec = init(Cipher.DECRYPT_MODE);
+
+                // unnecessary but to for compatibility with other cipher measurements
+                byte[] inputBytes = new byte[imageBytes.length];
+                for (int i = 0; i < imageBytes.length; i++)
+                    inputBytes[i] = (byte) imageBytes[i];
+
+                try {
+                    inputBytes = cipherDec.doFinal(rawInput);
+                } catch (Exception e) {
+                    throw new IllegalStateException("AES encryption failed", e);
+                }
+
+                // unnecessary but to for compatibility with other cipher measurements
+                for(int i = 0; i < imageBytes.length; i++)
+                    imageBytes[i] = imageBytes[i] < 0 ? ((int)imageBytes[i]) + 256 : imageBytes[i];
+
+                measurements[r] = System.currentTimeMillis() - start;
+            }
+
+            Thread.sleep(Constants.SleepTimeBetweenRoundsInSeconds * 1000);
+        }
+        catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
+
+        return measurements;
+
     }
 
     @Override

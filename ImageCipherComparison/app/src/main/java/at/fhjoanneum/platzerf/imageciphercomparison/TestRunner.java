@@ -39,23 +39,39 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
 
             // load Image = async
             String filename = config.Image;
-            ConvertedImage newImage = conv.ConvertFromArgbImage(filename);
+
+            boolean isJavaAesEncrypted = false;
+            ConvertedImage newImage;
+
+            if(filename.endsWith(".aesjavaencrypted.png")){
+                isJavaAesEncrypted = true;
+                String tmp = filename.replace(".aesjavaencrypted.png", ".png");
+                newImage = conv.ConvertFromArgbImage(tmp);
+            }
+            else {
+                newImage = conv.ConvertFromArgbImage(filename);
+            }
+
             String newFilename = "";
             long sumOfBytes = 0;
 
-            if(filename.contains("encrypted") && f == Function.Decrypt) {
-                String originalFile = filename.replace(".encrypted.png", "");
-                newFilename = originalFile + ".decrypted.png";
-                ConvertedImage originalImage = conv.GetOrigImageInfo(originalFile);
-                sumOfBytes = originalImage.SumOfBytes;
-            }
-            else if(f == Function.Encrypt) {
-                newFilename = filename + ".encrypted.png";
+            if(!isJavaAesEncrypted) {
+                if (filename.contains("encrypted") && f == Function.Decrypt) {
+                    String originalFile = filename.replace(".encrypted.png", "");
+                    newFilename = originalFile + ".decrypted.png";
+                    ConvertedImage originalImage = conv.GetOrigImageInfo(originalFile);
+                    sumOfBytes = originalImage.SumOfBytes;
+                } else if (f == Function.Encrypt) {
+                    newFilename = filename + ".encrypted.png";
+                    sumOfBytes = newImage.SumOfBytes;
+                }
             }
 
             publishProgress("done loading image: " + filename);
 
             for (ImageCipher curr : config.Ciphers) {
+
+
 
                 Wait(config.PauseBetweenCiphersInSeconds);
 
@@ -77,7 +93,10 @@ public class TestRunner extends AsyncTask<Integer, String, String> {
                     if (f == Function.Encrypt)
                         measurements = curr.encryptLong(newImage.ImageBytes, sumOfBytes, config.NumberOfIntRoundsToRun);
                     else if (f == Function.Decrypt){
-                        measurements = curr.decryptLong(newImage.ImageBytes, sumOfBytes, config.NumberOfIntRoundsToRun);
+                        if(curr.getName().equals("AES Java"))
+                            ((AesJavaCipher)curr).decryptLongFromImage(newImage.ImageBytes, filename, config.NumberOfIntRoundsToRun);
+                        else
+                            measurements = curr.decryptLong(newImage.ImageBytes, sumOfBytes, config.NumberOfIntRoundsToRun);
                     }
 
                     long endTime = System.nanoTime();
